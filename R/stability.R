@@ -1,0 +1,162 @@
+##' Stability selection for a quadrupen fit.
+##'
+##' Compute the stability path of a (possibly randomized) fitting
+##' procedure by subsampling as introduced by Meinshausen and Buhlmann
+##' (2010).
+##'
+##' @param x matrix of features, possibly sparsely encoded
+##' (experimental). Do NOT include intercept.
+##' 
+##' @param y response vector.
+##' 
+##' @param method a string for the fitting procedure used for 
+##' stability selection. Only \code{"elastic.net"} is available for the
+##' moment
+##' 
+##' @param subsamples integer indicating the number of subsamplings
+##' used to estimate the selection probabilities. Default is 100.
+##'
+##' @param sample.size integer indicating the size of each subsamples.
+##' Default is \code{floor(n/2)}.
+##' 
+##' @param randomize Should a randomized version of the fitting
+##' procedure by used? Default is \code{TRUE}. See details below.
+##' 
+##' @param weakness Coefficient used for randomizing. Default is
+##' \code{0.5}. Ignored when \code{randomized=TRUE}. See details
+##' below.
+##' 
+##' @param folds list with \code{subsamples} entries with vectors
+##' describing the folds to use for the stability procedure. By
+##' default, the folds are randomly sampled with the specified
+##' \code{subsamples} argument.
+##'
+##' @param verbose logical; indicates if the progression should be
+##' displayed. Default is \code{TRUE}.
+##'
+##' @param ... additional parameters to overwrite the defaults of the
+##' \code{'method'} fitting procedure. See the corresponding
+##' documentation (e.g., \code{\link{elastic.net}})
+##'
+##' @return An object of class "stability-path". 
+##'
+##' @note When \code{randomized = TRUE}, the \code{penscale} argument
+##' that weights the l1-penalty of the fitting procedure is perturbed (divided)
+##' for each subsample by a random variable uniformly distributed on
+##' \if{latex}{\eqn{[\alpha,1]}}\if{html}{[&#945;,1]}\if{text}{\eqn{[alpha,1]}},
+##' alpha being the weakness parameter.
+##'
+##' @references N. Meinshausen and P. Buhlmann (2010). Stability
+##' Selection, JRSS(B).
+##'
+##' @seealso \code{\linkS4class{stability.path}} and
+##' \code{\link{plot.stability.path}}.
+##'
+##' @examples \dontrun{
+##' rm(list=ls())
+##' library(quadrupen)
+##' ## Simulating multivariate Gaussian with blockwise correlation
+##' ## and piecewise constant vector of parameters
+##' beta <- rep(c(0,1,0,-1,0), c(25,10,25,10,25))
+##' Soo  <- matrix(0.75,25,25) ## bloc correlation between zero variables
+##' Sww  <- matrix(0.75,10,10) ## bloc correlation between active variables
+##' Sigma <- bdiag(Soo,Sww,Soo,Sww,Soo) + 0.2
+##' diag(Sigma) <- 1
+##' n <- 100
+##' x <- as.matrix(matrix(rnorm(95*n),n,95) %*% chol(Sigma))
+##' y <- 10 + x %*% beta + rnorm(n,0,10)
+##' 
+##' ## Build a vector of label for true nonzeros
+##' labels <- rep("irrelevant", length(beta))
+##' labels[beta != 0] <- c("relevant")
+##' labels <- factor(labels, ordered=TRUE, levels=c("relevant","irrelevant"))
+##' 
+##' ## Call to stability selection function, 200 subsampling
+##' stabout <- stability(x,y, subsamples=200, lambda2=1, min.ratio=1e-2)
+##' ## Build the plot an recover the selected variable for a given cutoff
+##' ## and per-family error rate
+##' stabpath <- plot(stab, labels=labels, cutoff=0.75, PFER=1)
+##' 
+##' cat("\nFalse positives for the randomized Elastic-net with stability selection: ",
+##'      sum(labels[stabpath$selected] != "relevant"))
+##' cat("\nDONE.\n")
+##' }
+##' 
+##' @keywords models, regression
+##'
+##' @name stability
+##' @aliases stability
+##' @rdname stability
+##'
+##' @export
+stability <- function(x,
+                      y, 
+                      method      = "elastic.net",
+                      subsamples  = 100,
+                      sample.size = floor(n/2),
+                      randomize   = TRUE,
+                      weakness    = 0.5,
+                      verbose     = TRUE,
+                      folds       = replicate(subsamples, sample(1:nrow(x), sample.size), simplify=FALSE),
+                      ...) {
+
+  ## =============================================================
+  ## INITIALIZATION & PARAMETERS RECOVERY
+  p <- ncol(x)
+  n <- nrow(x)
+  user <- list(...)
+  defs <- default.args(method,n,p,user)
+  args <- modifyList(defs, user)
+  ## overwrite parameters irrelevant in and resampling context
+  args$control$verbose <- FALSE
+  args$max.feat <- p
+  ## Compute a grid of lambda1 (the smae for each fold)
+  if (is.null(args$lambda1)) {
+    input <- standardize(x,y,args$weights,args$intercept,args$normalize)
+    args$lambda1 <- get.lambda1(input$xty,args$penscale,args$nlambda1,args$min.ratio)
+    rm(input)
+  }
+  nlambda1 <- length(args$lambda1)
+  ## record the basic penscale value for randomizing
+  penscale <- args$penscale
+  ## save weights for subsampling
+  weights <- args$weights
+  ## Prepare blocs of sub samples to run jobs parallely
+  blocs <- split(1:subsamples, 1:getOption("mc.cores", 2L))
+
+  if (verbose) {
+    cat(paste("\n\nSTABILITY SELECTION ",ifelse(randomize,"with","without")," randomization (weakness = ",weakness,")",sep=""))
+    cat(paste("\nFitting procedure:",method," with lambda2 = ",args$lambda2," and an ",nlambda1,"-dimensional grid of lambda1.", sep=""))
+    cat("\nRunning",length(blocs),"jobs parallely (1 per core)")
+    cat("\nApprox.", length(blocs[[1]]),"subsamplings for each job for a total of",subsamples)
+  }
+
+  ## function to run on each core
+  bloc.stability <- function(subsets) {
+    select <- Matrix(0,length(args$lambda1),p)
+    for (s in 1:length(subsets)) {
+      if (randomize) {args$penscale <- penscale / runif(p,weakness,1)}
+      args$weights <- weights[folds[[subsets[s]]]]
+      select <- select + (do.call(method, c(list(x=x[folds[[subsets[s]]], ], y=y[folds[[subsets[s]]]]), args))@coefficients != 0)/subsamples
+    }
+    return(select)
+  }
+
+  ## Now launch the B jobs...
+  prob.bloc <- mclapply(blocs, bloc.stability)
+
+  ## Construct the probability path
+  path <- Matrix(0,nlambda1,p)
+  for (b in 1:length(prob.bloc)) {
+    path <- path + prob.bloc[[b]]
+  }
+  
+  return(new("stability.path",
+             probabilities = path        ,
+             penalty       = method      ,
+             naive         = args$naive  ,
+             lambda1       = args$lambda1,
+             lambda2       = args$lambda2))
+
+}
+
