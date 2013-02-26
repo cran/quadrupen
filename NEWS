@@ -1,4 +1,18 @@
 NEWS/Changelog
 
+0.2-0	(2013-02-26)
+    Major:
+    +	added bounded regression (regression penlalized by infinity norm + structred l2 norm)
+    +   added corresponding functionalies for cross-validation and stability path
+    Minor:
+    +   corrected wrong annotations of the stability path (PFER)
+    +   handled normalization internally ('normalize' is no longer a parameter) 
+    +   more simple internal handling of penscales and correction of the rescaling of the intercept
+    +   better use of multicore features
+    +   handled runtime error exception in RcppArmadillo when the system is singular (end of the solution path)
+        A consequence is quadrupen is less likely to crash due to user's "bad" parametrization 
+    +   simplification of the C++ code, bugs corrected, probably new ones added :-'(
+    + added 'examples' and 'tests' directories
+
 0.1-0	(2012-10-09)
     +	first build: structured elastic-net with (weighted) quadratic loss, cross-validation and stability selection methods.

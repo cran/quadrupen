@@ -21,11 +21,11 @@ x <- as.matrix(matrix(rnorm(100*n),n,100) %*% chol(Sigma))
 y <- mu + x %*% beta + rnorm(n, 0, sigma)
 
 ## Test simple and double cross-validation
-cv.double <- crossval(x, y, lambda2=10^seq(2,-2,len=50))
-cv.simple <- crossval(x, y, lambda2=slot(cv.double, "lambda2.min"))
+cv.double <- crossval(x, y, "bounded.reg", lambda2=10^seq(2,-2,len=50))
+cv.simple <- crossval(x, y, "bounded.reg", lambda2=slot(cv.double, "lambda2.min"))
 plot(cv.double)
 plot(cv.simple)
-fit <- elastic.net(x,y,lambda2=slot(cv.double, "lambda2.min"))
+fit <- bounded.reg(x,y,lambda2=slot(cv.double, "lambda2.min"))
 
 ## plot the solution path
 plot(fit)
@@ -33,8 +33,8 @@ plot(fit)
 print(fit)
 
 ## Call to stability selection function, 200 subsampling
-stab <- stability(x,y, subsamples=200, lambda2=1, min.ratio=1e-2)
+stab <- stability(x,y, "bounded.reg", subsamples=200, lambda2=1, min.ratio=1e-2)
 ## plot the stability path
-plot(stab, labels=labels, nvar=20)
+plot(stab, labels=labels)
 ## a quick summary of the fit
 print(stab)

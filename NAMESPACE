@@ -1,3 +1,4 @@
+export(bounded.reg)
 export(crossval)
 export(elastic.net)
 export(stability)

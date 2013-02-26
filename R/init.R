@@ -1,11 +1,13 @@
-.onLoad <- function(libname, pkgname){
-    packageStartupMessage(paste(""                                                          ,
-              "----------------------------------------------------",
-              ""                                                    ,
-              "  'quadrupen' package version 0.1-0 / first release" ,
-              ""                                                    ,
-              " May be buggy and default parameters inappropriate" ,
-              " Any user's feedback is thus very welcome!",
-              "----------------------------------------------------",
-              sep = "\n"))
-  }
+.onAttach <- function(...) {
+  welcome <- paste(""                                                          ,
+                   "---------------------------------------------------",
+                   ""                                                    ,
+                   "  'quadrupen' package version 0.2-0                " ,
+                   ""                                                    ,
+                   " May be buggy and default parameters inappropriate" ,
+                   " Any user's feedback is thus very welcome!",
+                   "---------------------------------------------------",
+                   sep = "\n")
+  packageStartupMessage(welcome)
+}
+

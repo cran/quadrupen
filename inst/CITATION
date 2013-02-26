@@ -1,0 +1,10 @@
+citHeader("To cite 'quadrupen' in publications, please use:")
+
+citEntry(entry = "TechReport",
+  author = "Yves Grandvalet, Julien Chiquet and Christophe Ambroise",
+  title = "Sparsity by Worst-Case Quadratic Penalties",
+  institution = "arXiv preprint",
+  year = "2012",
+  url = "http://arxiv.org/abs/1210.2077",
+  textVersion = "Y. Grandvalet, J. Chiquet and C. Ambroise. Sparsity by Worst-Case Quadratic Penalties, arXiv preprint, 2012."
+)

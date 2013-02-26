@@ -7,30 +7,34 @@
   through the \code{crossval} method.
 }
 \section{Slots}{
-  \describe{ \item{\code{lambda1}:}{vector of l1-penalty
-  levels for which each cross-validation has been
-  performed.} \item{\code{lambda2}:}{vector (or scalar) of
-  l2-penalty levels for which each cross-validation has
-  been performed.} \item{\code{lambda1.min}:}{level of
-  l1-penalty that minimizes the error estimated by
-  cross-validation.} \item{\code{lambda1.1se}:}{largest
-  level of l1-penalty such has the cross-validated error is
-  within 1 standard error of the minimum.}
-  \item{\code{lambda2.min}:}{level of l2-penalty that
-  minimizes the error estimated by cross-validation.}
-  \item{\code{cv.error}:}{a data frame containing the mean
-  cross-validated error and its associated standard error
-  for each values of \code{lamdba1} and \code{lamdba2}.}
+  \describe{ \item{\code{lambda1}:}{vector of
+  \eqn{\lambda_1}{lambda1} (\eqn{\ell_1}{l1} or
+  \eqn{\ell_\infty}{infinity} penalty levels) for which
+  each cross-validation has been performed.}
+  \item{\code{lambda2}:}{vector (or scalar) of
+  \eqn{\ell_2}{l2}-penalty levels for which each
+  cross-validation has been performed.}
+  \item{\code{lambda1.min}:}{level of
+  \eqn{\lambda_1}{lambda1} that minimizes the error
+  estimated by cross-validation.}
+  \item{\code{lambda1.1se}:}{largest level of
+  \eqn{\lambda_1}{lambda1} such as the cross-validated
+  error is within 1 standard error of the minimum.}
+  \item{\code{lambda2.min}:}{level of
+  \eqn{\lambda_2}{lambda2} that minimizes the error
+  estimated by cross-validation.} \item{\code{cv.error}:}{a
+  data frame containing the mean cross-validated error and
+  its associated standard error for each values of
+  \code{lambda1} and \code{lambda2}.}
   \item{\code{folds}:}{list of \code{K} vectors indicating
   the folds used for cross-validation.}
   \item{\code{beta.min}:}{the vector of parameters obtained
   by fitting the problem on the full data set \code{x} and
-  \code{y} with l1-penalty \code{lambda1.min} and
-  l2-penalty \code{lambda2.min}.}
-  \item{\code{beta.1se}:}{the vector of parameters obtained
-  by fitting the problem on the full data set \code{x} and
-  \code{y} with l1-penalty \code{lambda1.1se} and
-  l2-penalty \code{lambda2.min}. }
+  \code{y} with \code{lambda1.min} and \code{lambda2.min}
+  penalties.} \item{\code{beta.1se}:}{the vector of
+  parameters obtained by fitting the problem on the full
+  data set \code{x} and \code{y} with \code{lambda1.1se}
+  and \code{lambda2.min} penalties. }
 
   }
 

@@ -5,17 +5,20 @@
 #ifndef _quadrupen_UTILS_H
 #define _quadrupen_UTILS_H
 
+#ifndef _RCPP_ARMA_H
+#define _RCPP_ARMA_H
 #include <RcppArmadillo.h>
+#endif 
 
 using namespace Rcpp;
 using namespace arma;
 
-vec signs(vec  x, double zero) ;
+#define ZERO 2e-16 // practical zero
 
-double sign(double  x, double zero) ;
-
-mat cholupdate(mat R , mat XtX) ;
-
-mat choldowndate(mat R, int j) ;
-
+inline double sign(double x) {return((x > ZERO) ? 1 : ((x < ZERO) ? -1 : 0)) ;}
+inline vec signs(vec x) {
+  vec signs = zeros<vec>(x.n_elem);
+  for (int j=0; j<x.n_elem; j++) {signs(j) = sign(x(j));}
+  return(signs);
+}
 #endif 
