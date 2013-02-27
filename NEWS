@@ -1,5 +1,8 @@
 NEWS/Changelog
 
+0.2-2	(2013-03-xx)
+    +   minor fix to comply with recent ggplot2 update.
+
 0.2-1	(2013-02-27)
     +   minor fix to pass CRAN check on Windows operating systems.
 
@@ -9,11 +12,11 @@ NEWS/Changelog
     +   added corresponding functionalies for cross-validation and stability path
     Minor:
     +   corrected wrong annotations of the stability path (PFER)
-    +   handled normalization internally ('normalize' is no longer a parameter) 
+    +   handled normalization internally ('normalize' is no longer a parameter)
     +   more simple internal handling of penscales and correction of the rescaling of the intercept
     +   better use of multicore features
     +   handled runtime error exception in RcppArmadillo when the system is singular (end of the solution path)
-        A consequence is quadrupen is less likely to crash due to user's "bad" parametrization 
+        A consequence is quadrupen is less likely to crash due to user's "bad" parametrization
     +   simplification of the C++ code, bugs corrected, probably new ones added :-'(
     +   added 'examples' and 'tests' directories
 

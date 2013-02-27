@@ -67,8 +67,7 @@
   stability selection.
 }
 \examples{
-rm(list=ls())
-library(quadrupen)
+\dontrun{
 ## Simulating multivariate Gaussian with blockwise correlation
 ## and piecewise constant vector of parameters
 beta <- rep(c(0,1,0,-1,0), c(25,10,25,10,25))
@@ -87,7 +86,7 @@ labels <- factor(labels, ordered=TRUE, levels=c("relevant","irrelevant"))
 
 ## Call to stability selection function, 200 subsampling
 stab <- stability(x,y, subsamples=200, lambda2=1, min.ratio=1e-2)
-\dontrun{
+
 ## Build the plot an recover the selected variable
 plot(stab, labels=labels)
 plot(stab, xvar="fraction", labels=labels, sel.mode="PFER", cutoff=0.75, PFER=2)

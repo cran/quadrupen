@@ -127,7 +127,7 @@
 ##' @rdname elastic.net
 ##' @keywords models, regression
 ##'
-##' @examples \dontrun{
+##' @examples
 ##' ## Simulating multivariate Gaussian with blockwise correlation
 ##' ## and piecewise constant vector of parameters
 ##' beta <- rep(c(0,1,0,-1,0), c(25,10,25,10,25))
@@ -142,9 +142,8 @@
 ##'
 ##' ## This gives a great advantage to the elastic-net
 ##' ## for support recovery
-##' beta.lasso <- slot(crossval(x,y,lambda2=0) , "beta.min")
-##' beta.enet  <- slot(crossval(x,y,lambda2=10), "beta.min")
-##' beta.struc <- slot(crossval(x,y,lambda2=10,struct=solve(Sigma)), "beta.min")
+##' beta.lasso <- slot(crossval(x,y,lambda2=0 , mc.cores=2) , "beta.min")
+##' beta.enet  <- slot(crossval(x,y,lambda2=10, mc.cores=2), "beta.min")
 ##'
 ##' cat("\nFalse positives for the Lasso:", sum(sign(beta) != sign(beta.lasso)))
 ##' cat("\nFalse positives for the Elastic-net:", sum(sign(beta) != sign(beta.enet)))
@@ -157,7 +156,7 @@
 ##' plot(elastic.net(x,y,lambda2=0), label=labels) ## a mess
 ##' plot(elastic.net(x,y,lambda2=10), label=labels) ## a lot better
 ##' plot(elastic.net(x,y,lambda2=10,struct=solve(Sigma)), label=labels) ## even better
-##' }
+##'
 ##'
 ##' @export
 elastic.net <- function(x,
@@ -381,7 +380,7 @@ elastic.net <- function(x,
 ##' @rdname bounded.reg
 ##' @keywords models, regression
 ##'
-##' @examples \dontrun{
+##' @examples
 ##' ## Simulating multivariate Gaussian with blockwise correlation
 ##' ## and piecewise constant vector of parameters
 ##' beta <- rep(c(0,1,0,-1,0), c(25,10,25,10,25))
@@ -401,7 +400,7 @@ elastic.net <- function(x,
 ##' plot(bounded.reg(x,y,lambda2=0) , label=labels) ## a mess
 ##' plot(bounded.reg(x,y,lambda2=10), label=labels) ## good guys are at the boundaries
 ##' plot(bounded.reg(x,y,lambda2=10,struct=solve(Sigma)), label=labels) ## even better
-##' }
+##'
 ##'
 ##' @export
 bounded.reg <- function(x,
@@ -499,13 +498,14 @@ quadrupen <- function(x,
       quadra <- FALSE
     }
   }
-  ctrl <- list(verbose     = 1, # default control options
-               timer       = FALSE,
-               max.iter    = 500,
-               method      = "quadra",
-               threshold   = ifelse(quadra, 1e-7, 1e-2),
-               monitor     = 0,
-               bulletproof = TRUE)
+  ctrl <- list(verbose      = 1, # default control options
+               timer        =  FALSE,
+               max.iter     = 500,
+               method       = "quadra",
+               threshold    = ifelse(quadra, 1e-7, 1e-2),
+               monitor      = 0,
+               bulletproof  = TRUE,
+               call.from.mv = FALSE)
   ctrl[names(control)] <- control # overwritten by user specifications
   if (ctrl$timer) {r.start <- proc.time()}
 
@@ -514,7 +514,8 @@ quadrupen <- function(x,
                         "bounded.reg" = get.lambda1.li)
   ## ======================================================
   ## INTERCEPT AND NORMALIZATION TREATMENT
-  input <- standardize(x,y,intercept,penscale)
+  input <- standardize(x,y,intercept,penscale,
+                       call.from.mv=ctrl$call.from.mv)
 
   ## ======================================================
   ## GENERATE A GRID OF PENALTY IF NONE HAS BEEN PROVIDED
@@ -661,27 +662,34 @@ quadrupen <- function(x,
 
 }
 
-standardize <- function(x,y,intercept,penscale,zero=.Machine$double.eps) {
+standardize <- function(x,y,intercept,penscale,zero=.Machine$double.eps,
+                        call.from.mv = FALSE) {
 
   n <- length(y)
+  p <- ncol(x)
   ## ============================================
   ## INTERCEPT AND NORMALIZATION TREATMENT
   if (intercept) {
     xbar <- colMeans(x)
     ybar <- mean(y)
   } else {
-    xbar <- rep(0,ncol(x))
+    xbar <- rep(0,p)
     ybar <- 0
   }
 
   ## ============================================
   ## NORMALIZATION
-  normx <- sqrt(drop(colSums(x^2)- n*xbar^2))
-  if (any(normx < zero)) {
-    warning("A predictor has no signal: you should remove it.")
-    normx[abs(normx) < zero] <- 1 ## dirty way to handle 0/0
+  if (call.from.mv) { ## already scaled...
+    normx <- rep(1,p)
+  } else {
+    normx <- sqrt(drop(colSums(x^2)- n*xbar^2))
+    if (any(normx < zero)) {
+      warning("A predictor has no signal: you should remove it.")
+      normx[abs(normx) < zero] <- 1 ## dirty way to handle 0/0
+    }
   }
-  ## xbar is scaled to handle internaly the centering of X for sparsity purpose
+  ## xbar is scaled to handle internaly the centering of X for
+  ## sparsity purpose
   xbar <- xbar/normx
   normy <- sqrt(sum(y^2))
 

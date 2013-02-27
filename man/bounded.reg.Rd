@@ -173,7 +173,6 @@
   larger \code{'min.ratio'} argument.
 }
 \examples{
-\dontrun{
 ## Simulating multivariate Gaussian with blockwise correlation
 ## and piecewise constant vector of parameters
 beta <- rep(c(0,1,0,-1,0), c(25,10,25,10,25))
@@ -193,7 +192,6 @@ labels[beta != 0] <- "relevant"
 plot(bounded.reg(x,y,lambda2=0) , label=labels) ## a mess
 plot(bounded.reg(x,y,lambda2=10), label=labels) ## good guys are at the boundaries
 plot(bounded.reg(x,y,lambda2=10,struct=solve(Sigma)), label=labels) ## even better
-}
 }
 \seealso{
   See also \code{\linkS4class{quadrupen}},

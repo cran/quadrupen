@@ -134,7 +134,7 @@ setMethod("plot", "cvpen", definition =
       d <- d + geom_tile(aes(fill=mean)) + stat_contour(size=0.2, binwidth=diff(range(x@cv.error$mean))/10) + ggtitle(main)
       d <- d + scale_x_continuous(trans=log10_trans()) + xlab(expression(log[10](lambda[1])))
       d <- d + scale_y_continuous(trans=log10_trans()) + ylab(expression(log[10](lambda[2])))
-      d <- d + annotation_logticks(col="black")
+      d <- d + annotation_logticks()
       in.1se <- which(x@cv.error$mean - x@cv.error$serr <= min(x@cv.error$mean))
       d <- d + stat_contour(alpha=0.5, colour="#CCCCCC", size=0.65, breaks=quantile(x@cv.error$mean[in.1se], probs=seq(0,1,len=6)))
     } else {
@@ -149,7 +149,7 @@ setMethod("plot", "cvpen", definition =
       }
       if (log.scale) {
         d <- d + xlab(expression(log[10](lambda[1])))
-        d <- d + annotation_logticks(sides="b",col="black")
+        d <- d + annotation_logticks(sides="b")
       } else {
         d <- d + xlab( expression(lambda[1]) )
       }
