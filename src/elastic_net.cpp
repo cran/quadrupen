@@ -8,7 +8,7 @@
 using namespace Rcpp;
 using namespace arma;
 
-SEXP elastic_net(SEXP X, SEXP XTY, SEXP S, SEXP LAMBDA1, SEXP LAMBDA2, SEXP XBAR, SEXP YBAR, SEXP NORMX, SEXP NORMY, SEXP WEIGHTS, SEXP NAIVE, SEXP EPS, SEXP MAXITER, SEXP MAXFEAT, SEXP FUN, SEXP VERBOSE, SEXP SPARSE, SEXP MONITOR) {
+SEXP elastic_net(SEXP X, SEXP XTY, SEXP S, SEXP LAMBDA1, SEXP LAMBDA2, SEXP XBAR, SEXP NORMX, SEXP NORMY, SEXP WEIGHTS, SEXP NAIVE, SEXP EPS, SEXP MAXITER, SEXP MAXFEAT, SEXP FUN, SEXP VERBOSE, SEXP SPARSE, SEXP MONITOR) {
 
   // disable messages being printed to the err2 stream
   std::ostream nullstream(0);
@@ -19,7 +19,6 @@ SEXP elastic_net(SEXP X, SEXP XTY, SEXP S, SEXP LAMBDA1, SEXP LAMBDA2, SEXP XBAR
   vec    lambda1  = as<vec>    (LAMBDA1)   ; // penalty levels
   double lambda2  = as<double> (LAMBDA2)   ; // the smooth (ridge) penality
   vec    xbar     = as<vec>    (XBAR)      ; // mean of the predictors
-  double ybar     = as<double> (YBAR)      ; // mean of the response
   vec    normx    = as<vec>    (NORMX)     ; // norm of the predictors
   vec    weights  = as<vec>    (WEIGHTS)   ; // norm of the predictors
   double normy    = as<double> (NORMY)     ; // norm of the predictors
@@ -83,7 +82,6 @@ SEXP elastic_net(SEXP X, SEXP XTY, SEXP S, SEXP LAMBDA1, SEXP LAMBDA2, SEXP XBAR
   wall_clock timer                       ; // clock
 
   // Initializing "second level" variables (within the active set - for a fixed value of lamdba)
-  int   iter     = 0                     ; // current iterate
   uword var_in                           ; // currently added variable
   int   nbr_in   = 0                     ; // # of currently added variables
   int   nbr_opt  = 0                     ; // # of current calls to the optimization routine
@@ -122,7 +120,7 @@ SEXP elastic_net(SEXP X, SEXP XTY, SEXP S, SEXP LAMBDA1, SEXP LAMBDA2, SEXP XBAR
     max_grd[m] = grd_norm.max(var_in) ;
     if (max_grd[m] < 0) {max_grd[m] = 0;}
 
-    while (max_grd[m] > eps & it_active[m] < max_iter) {
+    while ((max_grd[m] > eps) && (it_active[m] < max_iter)) {
       // _____________________________________________________________
       //
       // (1) VARIABLE ACTIVATION IF APPLICABLE

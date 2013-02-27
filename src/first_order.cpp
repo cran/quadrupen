@@ -43,7 +43,7 @@ int fista_lasso(vec  &x0   ,
       l_num = as_scalar(2 * (fk - f0 - dot(df, xk-s) ));
       l_den = as_scalar(pow(norm(xk-s,2),2));
 
-      if (L * l_den >= l_num  | sqrt(l_den) < eps) {
+      if ((L * l_den >= l_num) || (sqrt(l_den) < eps)) {
 	found = true;
       } else {
 	L = fmax(2*L, l_num/l_den);
@@ -83,7 +83,7 @@ int fista_breg(vec    &x0,
   
   colvec xk = x0        ; // output vector
   colvec  s = x0        ;
-  int iter = 0, j = 0      ; // current iterate
+  int iter = 0          ; // current iterate
   double delta = 2*eps  ; // change in beta
   int max_iter  = 10000 ; // max. number of iteration
 
@@ -93,7 +93,7 @@ int fista_breg(vec    &x0,
 
   double l_num, l_den ;
 
-  while (delta > eps*eps & iter < max_iter) {
+  while ((delta > eps*eps) && (iter < max_iter)) {
 
     f0 = as_scalar(.5 * strans(s) * xtx * s - strans(xty) * s) ;
     grd = - xty + xtx * s ;
@@ -106,7 +106,7 @@ int fista_breg(vec    &x0,
       l_num = as_scalar(2 * (fk - f0 - dot(grd, xk-s) ));
       l_den = as_scalar(pow(norm(xk-s,2),2));
       
-      if (L0 * l_den >= l_num  | sqrt(l_den) < eps) {
+      if ((L0 * l_den >= l_num) || (sqrt(l_den) < eps)) {
 	found = true;
       } else {
 	L0 = fmax(2*L0, l_num/l_den);

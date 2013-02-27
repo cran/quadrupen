@@ -117,6 +117,10 @@ stability <- function(x,
 
   ## =============================================================
   ## INITIALIZATION & PARAMETERS RECOVERY
+  if (Sys.info()[['sysname']] == "Windows") {
+    warning("\nWindows does not support fork, enforcing mc.cores to '1'.")
+    mc.cores <- 1
+  }
   penalty <- match.arg(penalty)
   get.lambda1 <- switch(penalty,
                         "elastic.net" = get.lambda1.l1,

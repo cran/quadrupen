@@ -1,5 +1,8 @@
 NEWS/Changelog
 
+0.2-1	(2013-02-27)
+    +   minor fix to pass CRAN check on Windows operating systems.
+
 0.2-0	(2013-02-26)
     Major:
     +	added bounded regression (regression penlalized by infinity norm + structred l2 norm)
@@ -12,7 +15,7 @@ NEWS/Changelog
     +   handled runtime error exception in RcppArmadillo when the system is singular (end of the solution path)
         A consequence is quadrupen is less likely to crash due to user's "bad" parametrization 
     +   simplification of the C++ code, bugs corrected, probably new ones added :-'(
-    + added 'examples' and 'tests' directories
+    +   added 'examples' and 'tests' directories
 
 0.1-0	(2012-10-09)
     +	first build: structured elastic-net with (weighted) quadratic loss, cross-validation and stability selection methods.

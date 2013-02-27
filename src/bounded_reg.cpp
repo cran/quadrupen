@@ -8,7 +8,7 @@
 using namespace Rcpp;
 using namespace arma;
 
-SEXP bounded_reg(SEXP X, SEXP XTY, SEXP STRUCT, SEXP LAMBDA1, SEXP LAMBDA2, SEXP XBAR, SEXP YBAR, SEXP NORMX, SEXP WEIGHTS, SEXP NAIVE, SEXP EPS, SEXP MAXITER, SEXP MAXFEAT, SEXP FUN, SEXP VERBOSE, SEXP BULLETPROOF) {
+SEXP bounded_reg(SEXP X, SEXP XTY, SEXP STRUCT, SEXP LAMBDA1, SEXP LAMBDA2, SEXP XBAR, SEXP NORMX, SEXP WEIGHTS, SEXP NAIVE, SEXP EPS, SEXP MAXITER, SEXP MAXFEAT, SEXP FUN, SEXP VERBOSE, SEXP BULLETPROOF) {
 
   // disable messages being printed to the err2 stream (armadillo's runtime error)
   std::ostream nullstream(0);
@@ -20,7 +20,6 @@ SEXP bounded_reg(SEXP X, SEXP XTY, SEXP STRUCT, SEXP LAMBDA1, SEXP LAMBDA2, SEXP
   double lambda2  = as<double> (LAMBDA2)     ; // penalty levels
   mat    struc    = as<mat>    (STRUCT)      ; // the structuring matrix
   vec    xbar     = as<vec>    (XBAR)        ; // mean of the predictors
-  double ybar     = as<double> (YBAR)        ; // mean of the response
   vec    normx    = as<vec>    (NORMX)       ; // norm of the predictors
   vec    weights  = as<vec>    (WEIGHTS)     ; // norm of the predictors
   bool   naive    = as<bool>   (NAIVE)       ; // naive or not (renormalize coefficients?)
@@ -37,7 +36,6 @@ SEXP bounded_reg(SEXP X, SEXP XTY, SEXP STRUCT, SEXP LAMBDA1, SEXP LAMBDA2, SEXP
   mat xtx = strans(x) * x + lambda2*struc    ; // t(x) * x + lambda2.S
 
   // Initializing "first level" variables (outside of the lambda1 loop)
-  uword  n        = weights.n_elem         ; // sample size
   uword  p        = xty.n_elem             ; // problem size
   uword  n_lambda = lambda1.n_elem         ; // # of penalty
   colvec beta     = zeros<vec>(p)          ; // vector of current parameters
@@ -56,7 +54,6 @@ SEXP bounded_reg(SEXP X, SEXP XTY, SEXP STRUCT, SEXP LAMBDA1, SEXP LAMBDA2, SEXP
   mat   jB                                 ; // contains column indices of the bounded variables
 
   // Initializing "second level" variables (within the active set - for a fixed value of lamdba)
-  int  iter     = 0                        ; // current iterate
   int  nbr_opt  = 0                        ; // # of current calls to the optimization routine
   double L      = max (xtx.diag())         ; // Lipschitz coefficients
 
@@ -81,7 +78,7 @@ SEXP bounded_reg(SEXP X, SEXP XTY, SEXP STRUCT, SEXP LAMBDA1, SEXP LAMBDA2, SEXP
       max_grd[m] = 0;
     }
     
-    while (max_grd[m] > eps & it_active[m] <= max_iter) {
+    while ((max_grd[m] > eps) && (it_active[m] <= max_iter)) {
       // _____________________________________________________________
       //
       // (1) KKT/SYSTEM RESOLUTION
