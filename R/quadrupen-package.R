@@ -152,5 +152,5 @@
 ##' }
 ##' @import Matrix Rcpp RcppArmadillo parallel ggplot2 reshape2 scales
 ##' grid
-##' @useDynLib quadrupen elastic_net
+##' @useDynLib quadrupen
 NULL

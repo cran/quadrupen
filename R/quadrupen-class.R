@@ -6,11 +6,11 @@
 ##'
 ##' @section Slots: \describe{
 ##'
-##' \item{\code{coefficients}:}{Matrix (class \code{"Matrix"}) of
+##' \item{\code{coefficients}:}{Matrix (class \code{"dgCMatrix"}) of
 ##' coefficients with respect to the original input. The number of
 ##' rows corresponds the length of \code{lambda1}.}
 ##'
-##' \item{\code{active.set}:}{Matrix (class \code{"Matrix"}, generally
+##' \item{\code{active.set}:}{Matrix (class \code{"dgCMatrix"}, generally
 ##' sparse) indicating the 'active' variables, in the sense that they
 ##' activate the constraints. For the \code{\link{elastic.net}}, it
 ##' corresponds to the nonzero variables; for the
@@ -58,11 +58,14 @@
 ##' contains various indicators dealing with the optimization
 ##' process.}
 ##'
-##' \item{\code{residuals}:}{Vector (class \code{"numeric"}) of
-##' residuals.}
+##' \item{\code{residuals}:}{Matrix of residuals, each column
+##' corresponding to a value of \code{lambda1}.}
 ##'
-##' \item{\code{fitted}:}{Vector (class \code{"numeric"}) of fitted
-##' values.}  }
+##' \item{\code{r.squared}:}{Vector (class \code{"numeric"}) given the
+##' coefficient of determination as a function of lambda1.}
+##'
+##' \item{\code{fitted}:}{Matrix of fitted values, each column
+##' corresponding to a value of \code{lambda1}.}  }
 ##'
 ##' @section Methods:
 ##' This class comes with the usual \code{predict(object, newx, ...)},
@@ -96,22 +99,25 @@
 ##'
 ##' @importFrom stats fitted predict residuals deviance
 ##'
+setClassUnion("strClass", c("Matrix","NULL"))
+setClassUnion("mat", c("Matrix","matrix"))
 setClass("quadrupen",
   representation = representation(
-     coefficients  = "Matrix"   ,
-     active.set    = "Matrix"   ,
+     coefficients  = "Matrix",
+     active.set    = "Matrix",
      intercept     = "logical"  ,
      mu            = "numeric"  ,
      meanx         = "numeric"  ,
      normx         = "numeric"  ,
-     fitted        = "Matrix"   ,
-     residuals     = "Matrix"   ,
+     fitted        = "mat"      ,
+     residuals     = "mat"      ,
+     r.squared     = "numeric"  ,
      penscale      = "numeric"  ,
      penalty       = "character",
      naive         = "logical"  ,
      lambda1       = "numeric"  ,
      lambda2       = "numeric"  ,
-     struct        = "Matrix"   ,
+     struct        = "strClass" ,
      control       = "list"     ,
      monitoring    = "list")
 )
@@ -286,13 +292,7 @@ setMethod("predict", "quadrupen", definition =
      if (is.null(newx)) {
        return(object@fitted)
      } else {
-       if (length(object@intercept) != 1) {
-         intercept <- matrix(rep(t(object@intercept), nrow(newx)),
-                             nrow=nrow(newx), byrow=TRUE)
-         return(intercept + newx %*% t(object@coefficients))
-       } else {
-         return(newx %*% t(object@coefficients))
-       }
+       return(sweep(newx %*% t(object@coefficients),2L,-object@mu,check.margin=FALSE))
      }
    }
 )
@@ -310,7 +310,7 @@ setMethod("residuals", "quadrupen", definition =
 
 setMethod("deviance", "quadrupen", definition =
    function(object, newx=NULL, newy=NULL, ...) {
-     dev <- apply(residuals(object, newx, newy)^2,2,sum)
+     dev <- colSums(residuals(object, newx, newy)^2)
      return(dev)
    }
 )

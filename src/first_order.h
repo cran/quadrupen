@@ -5,10 +5,8 @@
 #ifndef _quadrupen_FIRSTORDER_H
 #define _quadrupen_FIRSTORDER_H
 
-#ifndef _RCPP_ARMA_H
-#define _RCPP_ARMA_H
 #include <RcppArmadillo.h>
-#endif 
+#include "utils.h"
 
 using namespace Rcpp;
 using namespace arma;

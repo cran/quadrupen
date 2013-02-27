@@ -1,7 +1,7 @@
 \docType{methods}
 \name{plot,quadrupen-method}
-\alias{plot,quadrupen-method}
 \alias{plot.quadrupen}
+\alias{plot,quadrupen-method}
 \title{Plot method for a quadrupen object}
 \arguments{
   \item{x}{output of a fitting procedure of the

@@ -123,7 +123,7 @@ crossval <- function(x,
   args <- modifyList(defs, user)
   ## Compute a grid of lambda1 (the same for each fold)
   if (is.null(args$lambda1)) {
-    input <- standardize(x,y,args$intercept,args$penscale)
+    input <- standardize(x,y,args$intercept,args$normalize,args$penscale)
     args$lambda1 <- get.lambda1(input$xty,args$nlambda1,args$min.ratio)
     rm(input)
   }
@@ -176,8 +176,12 @@ crossval <- function(x,
   best.fit <- do.call(quadrupen, c(list(x=x,y=y),args))
 
   ## Finally recover the CV choice (minimum and 1-se rule)
-  beta.min <- best.fit@coefficients[match(lambda1.min, args$lambda1),]
-  beta.1se <- best.fit@coefficients[match(lambda1.1se, args$lambda1),]
+  ind.max <- nrow(best.fit@coefficients)
+  ind.min <- min(match(lambda1.min, args$lambda1),ind.max)
+  ind.1se <- min(match(lambda1.1se, args$lambda1),ind.max)
+
+  beta.min <- best.fit@coefficients[ind.min,]
+  beta.1se <- best.fit@coefficients[ind.1se,]
 
   return(new("cvpen",
              lambda1     = args$lambda1,
@@ -229,12 +233,14 @@ simple.cv <- function(folds, x, y, args, lambda2, mc.cores) {
 default.args <- function(penalty,n,p,user) {
   lambda2 <- ifelse(is.null(user$lambda2),0.01,user$lambda2)
   return(list(
+    beta0     = NULL,
     lambda1   = NULL,
     lambda2   = 0.01,
     penalty   = penalty,
     penscale  = rep(1,p),
     struct    = NULL,
     intercept = TRUE,
+    normalize = TRUE,
     naive     = FALSE,
     nlambda1  = ifelse(is.null(user$lambda1),100,length(user$lambda1)),
     min.ratio = ifelse(n<p,0.01,5e-3),

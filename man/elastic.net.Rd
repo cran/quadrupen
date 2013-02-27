@@ -4,17 +4,16 @@
 \usage{
   elastic.net(x, y, lambda1 = NULL, lambda2 = 0.01,
     penscale = rep(1, p), struct = NULL, intercept = TRUE,
-    naive = FALSE,
+    normalize = TRUE, naive = FALSE,
     nlambda1 = ifelse(is.null(lambda1), 100, length(lambda1)),
     min.ratio = ifelse(n <= p, 0.01, 1e-04),
     max.feat = ifelse(lambda2 < 0.01, min(n, p), min(4 * n, p)),
-    control = list(), checkargs = TRUE)
+    beta0 = NULL, control = list(), checkargs = TRUE)
 }
 \arguments{
   \item{x}{matrix of features, possibly sparsely encoded
-  (experimental). Do NOT include intercept. Predictors are
-  normalized internally to have unit L2 norm before
-  fitting. Coefficients will then be rescaled to the
+  (experimental). Do NOT include intercept. When normalized
+  os \code{TRUE}, coefficients will then be rescaled to the
   original scale.}
 
   \item{y}{response vector.}
@@ -44,6 +43,10 @@
   \item{intercept}{logical; indicates if an intercept
   should be included in the model. Default is \code{TRUE}.}
 
+  \item{normalize}{logical; indicates if variables should
+  be normalized to have unit L2 norm before fitting.
+  Default is \code{TRUE}.}
+
   \item{naive}{logical; Compute either 'naive' of classic
   elastic-net as defined in Zou and Hastie (2006): the
   vector of parameters is rescaled by a coefficient
@@ -71,6 +74,10 @@
   \code{lambda2} (<0.01) and \code{min(4*nrow(x),ncol(x))}
   otherwise. Use with care, as it considerably changes the
   computation time.}
+
+  \item{beta0}{a starting point for the vector of
+  parameter. When \code{NULL} (the default), will be
+  initialized at zero. May save time in some situation.}
 
   \item{control}{list of argument controlling low level
   options of the algorithm --use with care and at your own
@@ -161,10 +168,15 @@ n <- 50
 x <- as.matrix(matrix(rnorm(95*n),n,95) \%*\% chol(Sigma))
 y <- 10 + x \%*\% beta + rnorm(n,0,10)
 
+## Structured Elastic.net
+p <- ncol(x)
+C <- bandSparse(p,k=0:1,diagonals=list(rep(1,p),rep(-1,p-1)))
+
 ## This gives a great advantage to the elastic-net
 ## for support recovery
 beta.lasso <- slot(crossval(x,y,lambda2=0 , mc.cores=2) , "beta.min")
 beta.enet  <- slot(crossval(x,y,lambda2=10, mc.cores=2), "beta.min")
+beta.struc <- slot(crossval(x,y,lambda2=10, mc.cores=2, struct=t(C) \%*\% C), "beta.min")
 
 cat("\\nFalse positives for the Lasso:", sum(sign(beta) != sign(beta.lasso)))
 cat("\\nFalse positives for the Elastic-net:", sum(sign(beta) != sign(beta.enet)))

@@ -33,17 +33,17 @@ test_that("Consistency of quadrupen between sparse/non-sparse encoding of the pr
   x.sp <- Matrix(data$x, sparse=TRUE)
   max.feat <- s * 10
 
-  cat("\nProblem with",p, "predictors and",n,"samples,",s,"true nonzeros in beta.star.")
-  cat("\nThe densely encoded design matrix weights" , round(object.size(x.ns) /(1024^2),2), "Mo.")
-  cat("\nThe sparsely encoded design matrix weights", round(object.size(x.sp) /(1024^2),2), "Mo.")
+  cat("\n\tProblem with",p, "predictors and",n,"samples,",s,"true nonzeros in beta.star.")
+  cat("\n\tThe densely encoded design matrix weights" , round(object.size(x.ns) /(1024^2),2), "Mo.")
+  cat("\n\tThe sparsely encoded design matrix weights", round(object.size(x.sp) /(1024^2),2), "Mo.")
 
-  cat("\ndense coding...")
+  cat("\n\tdense coding...")
   out.enet.ns <- elastic.net(x.ns, y, lambda2=lambda2, max.feat=max.feat, min.ratio=1e-3, control=list(timer=TRUE))
 
   cat(" took", out.enet.ns@monitoring$external.timer, "seconds to activate",
       rowSums(out.enet.ns@active.set)[length(out.enet.ns@lambda1)],"variables.")
 
-  cat("\nsparse coding...")
+  cat("\n\tsparse coding...")
   out.enet.sp <- elastic.net(x.sp, y, lambda2=lambda2, max.feat=max.feat, min.ratio=1e-3,control=list(timer=TRUE))
   cat(" took", out.enet.sp@monitoring$external.timer, "seconds to activate",
       rowSums(out.enet.sp@active.set)[length(out.enet.sp@lambda1)],"variables.")

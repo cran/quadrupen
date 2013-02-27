@@ -135,7 +135,7 @@ stability <- function(x,
   args$max.feat <- p
   ## Compute a grid of lambda1 (the smae for each fold)
   if (is.null(args$lambda1)) {
-    input <- standardize(x,y,args$intercept,args$penscale)
+    input <- standardize(x,y,args$intercept,args$normalize,args$penscale)
     args$lambda1 <- get.lambda1(input$xty,args$nlambda1,args$min.ratio)
     rm(input)
   }

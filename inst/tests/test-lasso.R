@@ -1,31 +1,48 @@
-context("Consistency of the Lasso solution path")
+context("Consistency of the Lasso solution paths (package 'lars' and 'glmnet')")
 
-test_that("Consistency between 'quadrupen' and 'lars' packages", {
+test_that("lasso_quad2lars", {
 
   require(lars)
 
-  get.coef <- function(x,y,intercept) {
-      lasso.larsen <- lars(x,y,intercept=intercept)
+  get.lars <- function(x,y,intercept,normalize) {
+      lasso.larsen <- lars(x,y,intercept=intercept,normalize=normalize)
       iols <- nrow(lasso.larsen$beta) ## remove last entry corresponding to the OLS estimator
       lambda1 <-  lasso.larsen$lambda ## usde the lars lambda grid
-      lasso.quadru <- elastic.net(x,y, intercept=intercept, lambda1=lambda1, lambda2=0, control=list(method="quadra"))
-      return(list(coef.quad=as.matrix(lasso.quadru@coefficients),
-                  coef.lars=lasso.larsen$beta[-iols, ]))
+      lasso.quadru <- elastic.net(x,y, intercept=intercept, normalize=normalize,
+                                  lambda1=lambda1, lambda2=0, control=list(method="quadra"))
+      quad <- list(coef   = as.matrix(lasso.quadru@coefficients),
+                   meanx  = lasso.quadru@meanx,
+                   normx  = lasso.quadru@normx,
+                   rss    = deviance(lasso.quadru))
+
+      lars <- list(coef   = lasso.larsen$beta[-iols, ],
+                   meanx  = lasso.larsen$meanx,
+                   normx  = lasso.larsen$normx,
+                   rss    = lasso.larsen$RSS[-iols])
+
+      return(list(quad=quad,lars=lars))
   }
 
   ## PROSTATE DATA SET
-  prostate <- read.table("http://www-stat.stanford.edu/~tibs/ElemStatLearn/datasets/prostate.data")
-  x <- as.matrix(prostate[,1:8])
-  y <- prostate[,9]
+  load("prostate.rda")
+  x <- as.matrix(x)
 
   ## Run the tests...
-  with.intercept <-get.coef(x,y,intercept=TRUE)
-  expect_that(with.intercept$coef.quad,
-              is_equivalent_to(with.intercept$coef.lars))
+  with.intercept <-get.lars(x,y,TRUE,TRUE)
+  expect_that(with.intercept$quad,
+              is_equivalent_to(with.intercept$lars))
 
-  without.intercept <-get.coef(x,y,intercept=FALSE)
-  expect_that(without.intercept$coef.quad,
-              is_equivalent_to(without.intercept$coef.lars))
+  with.intercept.unnormalized <-get.lars(x,y,TRUE,FALSE)
+  expect_that(with.intercept.unnormalized$quad,
+              is_equivalent_to(with.intercept.unnormalized$lars))
+
+  without.intercept <-get.lars(x,y,FALSE,TRUE)
+  expect_that(without.intercept$quad,
+              is_equivalent_to(without.intercept$lars))
+
+  without.intercept.unnormalized <-get.lars(x,y,FALSE,FALSE)
+  expect_that(without.intercept.unnormalized$quad,
+              is_equivalent_to(without.intercept.unnormalized$lars))
 
   ## RANDOM DATA
   seed <- sample(1:10000,1)
@@ -45,17 +62,25 @@ test_that("Consistency between 'quadrupen' and 'lars' packages", {
   y <- 10 + x %*% beta + rnorm(n,0,10)
 
   ## Run the tests...
-  with.intercept <-get.coef(x,y,intercept=TRUE)
+  with.intercept <-get.lars(x,y,TRUE,TRUE)
   expect_that(with.intercept$coef.quad,
               is_equivalent_to(with.intercept$coef.lars))
 
-  without.intercept <-get.coef(x,y,intercept=FALSE)
+  with.intercept.unnormalized <-get.lars(x,y,TRUE,FALSE)
+  expect_that(with.intercept.unnormalized$coef.quad,
+              is_equivalent_to(with.intercept.unnormalized$coef.lars))
+
+  without.intercept <-get.lars(x,y,FALSE,TRUE)
   expect_that(without.intercept$coef.quad,
               is_equivalent_to(without.intercept$coef.lars))
 
+  without.intercept.unnormalized <-get.lars(x,y,FALSE,FALSE)
+  expect_that(without.intercept.unnormalized$coef.quad,
+              is_equivalent_to(without.intercept.unnormalized$coef.lars))
+
 })
 
-test_that("Consistency between 'quadrupen' and  'glmnet'", {
+test_that("lasso_quad2glmnet", {
 
   require(glmnet)
 
@@ -71,5 +96,15 @@ test_that("Consistency between 'quadrupen' and  'glmnet'", {
   lasso.glmn <- glmnet(x,y, lambda.min.ratio=1e-2, thresh=1e-20)
   lasso.quad <- elastic.net(x,y, lambda1=lasso.glmn$lambda*sqrt(n), lambda2=0)
 
-  expect_that(as.matrix(lasso.quad@coefficients), is_equivalent_to(as.matrix(t(lasso.glmn$beta))))
+  quad <- list(coef   = as.matrix(lasso.quad@coefficients),
+               mu     = lasso.quad@mu,
+               fitted = as.matrix(lasso.quad@fitted))
+
+  glmn <- list(coef   = as.matrix(t(lasso.glmn$beta)),
+               mu     = lasso.glmn$a0,
+               fitted = predict(lasso.glmn,x))
+
+
+  expect_that(quad, is_equivalent_to(glmn))
+
 })

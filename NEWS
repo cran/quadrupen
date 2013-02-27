@@ -1,14 +1,23 @@
 NEWS/Changelog
 
-0.2-2	(2013-03-xx)
-    +   minor fix to comply with recent ggplot2 update.
+0.2-3	(2013-08-26)
+    +   added back the 'normalize' parameter
+    +   standardization is performed within the C++ code
+    +   use of sparse conversion from Matrix to Armadillo
+    +   corrected bug with the 'intercept' and 'residuals' components of the quadrupen class
+    +   added more tests in the inst directory
+    +   correction in the documentation
+    +   added r.squared to the quadrupen class
+
+0.2-2	(2013-04-08)
+    +   minor fix to comply with recent ggplot2 updates.
 
 0.2-1	(2013-02-27)
     +   minor fix to pass CRAN check on Windows operating systems.
 
 0.2-0	(2013-02-26)
     Major:
-    +	added bounded regression (regression penlalized by infinity norm + structred l2 norm)
+    +	added bounded regression (regression penalized by infinity norm + structered l2 norm)
     +   added corresponding functionalies for cross-validation and stability path
     Minor:
     +   corrected wrong annotations of the stability path (PFER)

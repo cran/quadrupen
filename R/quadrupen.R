@@ -8,9 +8,9 @@
 ##' regularization. See details for the criterion optimized.
 ##'
 ##' @param x matrix of features, possibly sparsely encoded
-##' (experimental). Do NOT include intercept. Predictors are
-##' normalized internally to have unit L2 norm before fitting.
-##' Coefficients will then be rescaled to the original scale.
+##' (experimental). Do NOT include intercept. When normalized os
+##' \code{TRUE}, coefficients will then be rescaled to the original
+##' scale.
 ##'
 ##' @param y response vector.
 ##'
@@ -35,6 +35,10 @@
 ##'
 ##' @param intercept logical; indicates if an intercept should be
 ##' included in the model. Default is \code{TRUE}.
+##'
+##' @param normalize logical; indicates if variables should be
+##' normalized to have unit L2 norm before fitting.  Default is
+##' \code{TRUE}.
 ##'
 ##' @param naive logical; Compute either 'naive' of classic
 ##' elastic-net as defined in Zou and Hastie (2006): the vector of
@@ -61,6 +65,10 @@
 ##' \code{min(nrow(x),ncol(x))} for small \code{lambda2} (<0.01) and
 ##' \code{min(4*nrow(x),ncol(x))} otherwise. Use with care, as it
 ##' considerably changes the computation time.
+##'
+##' @param beta0 a starting point for the vector of parameter. When
+##' \code{NULL} (the default), will be initialized at zero. May save
+##' time in some situation.
 ##'
 ##' @param control list of argument controlling low level options of
 ##' the algorithm --use with care and at your own risk-- :
@@ -140,10 +148,15 @@
 ##' x <- as.matrix(matrix(rnorm(95*n),n,95) %*% chol(Sigma))
 ##' y <- 10 + x %*% beta + rnorm(n,0,10)
 ##'
+##' ## Structured Elastic.net
+##' p <- ncol(x)
+##' C <- bandSparse(p,k=0:1,diagonals=list(rep(1,p),rep(-1,p-1)))
+##'
 ##' ## This gives a great advantage to the elastic-net
 ##' ## for support recovery
 ##' beta.lasso <- slot(crossval(x,y,lambda2=0 , mc.cores=2) , "beta.min")
 ##' beta.enet  <- slot(crossval(x,y,lambda2=10, mc.cores=2), "beta.min")
+##' beta.struc <- slot(crossval(x,y,lambda2=10, mc.cores=2, struct=t(C) %*% C), "beta.min")
 ##'
 ##' cat("\nFalse positives for the Lasso:", sum(sign(beta) != sign(beta.lasso)))
 ##' cat("\nFalse positives for the Elastic-net:", sum(sign(beta) != sign(beta.enet)))
@@ -166,10 +179,12 @@ elastic.net <- function(x,
                         penscale  = rep(1,p),
                         struct    = NULL,
                         intercept = TRUE,
+                        normalize = TRUE,
                         naive     = FALSE,
                         nlambda1  = ifelse(is.null(lambda1),100,length(lambda1)),
                         min.ratio = ifelse(n<=p,1e-2,1e-4),
                         max.feat  = ifelse(lambda2<1e-2,min(n,p),min(4*n,p)),
+                        beta0     = NULL,
                         control   = list(),
                         checkargs = TRUE) {
 
@@ -178,8 +193,10 @@ elastic.net <- function(x,
   p <- ncol(x) # problem size
   n <- nrow(x) # sample size
   if (checkargs) {
-    if(!inherits(x, c("matrix", "Matrix")))
-      stop("x has to be of class 'matrix', 'dgeMatrix' or 'dgCMatrix'.")
+    if (is.data.frame(x))
+      x <- as.matrix(x)
+    if(!inherits(x, c("matrix", "dgCMatrix")))
+      stop("x has to be of class 'matrix' or 'dgCMatrix'.")
     if(any(is.na(x)))
       stop("NA value in x not allowed.")
     if(!is.numeric(y))
@@ -199,22 +216,32 @@ elastic.net <- function(x,
         stop("entries inlambda1 must all be postive.")
       if(is.unsorted(rev(lambda1)))
         stop("lambda1 values must be sorted in decreasing order.")
+      if (length(lambda1)>1 & !is.null(beta0))
+        warning("providing beta0 for a serie of l1 penalties mught be inefficient.")
     }
     if(min.ratio < 0)
-      stop("min.ratio must be non negative.")
+        stop("min.ratio must be non negative.")
     if (!is.null(struct)) {
       if (ncol(struct) != p | ncol(struct) != p)
-        stop("struct must be a (square) positive semidefinite matrix.")
+          stop("struct must be a (square) positive semidefinite matrix.")
       if (any(eigen(struct,only.values=TRUE)$values<0))
-        stop("struct must be a (square) positive semidefinite matrix.")
+          stop("struct must be a (square) positive semidefinite matrix.")
+      if(!inherits(struct, "dgCMatrix"))
+          struct <- as(struct, "dgCMatrix")
+    }
+    if (!is.null(beta0)) {
+      beta0 <- as.numeric(beta0)
+      if (length(beta0) != p)
+        stop("beta0 must be a vector with p entries.")
     }
     if (length(max.feat)>1)
-      stop("max.feat must be an integer.")
+        stop("max.feat must be an integer.")
     if(is.numeric(max.feat) & !is.integer(max.feat))
-      max.feat <- as.integer(max.feat)
+        max.feat <- as.integer(max.feat)
   }
 
-  return(quadrupen(x=x,
+  return(quadrupen(beta0 = beta0,
+                   x=x,
                    y=y,
                    penalty   = "elastic.net",
                    lambda1   = lambda1,
@@ -222,6 +249,7 @@ elastic.net <- function(x,
                    penscale  = penscale,
                    struct    = struct,
                    intercept = intercept,
+                   normalize = normalize,
                    naive     = naive,
                    nlambda1  = nlambda1,
                    min.ratio = min.ratio,
@@ -241,9 +269,9 @@ elastic.net <- function(x,
 ##' optimized.
 ##'
 ##' @param x matrix of features, possibly sparsely encoded
-##' (experimental). Do NOT include intercept. Predictors are
-##' normalized internally to have unit L2 norm before fitting.
-##' Coefficients will then be rescaled to the original scale.
+##' (experimental). Do NOT include intercept. When normalized os
+##' \code{TRUE}, coefficients will then be rescaled to the original
+##' scale.
 ##'
 ##' @param y response vector.
 ##'
@@ -271,6 +299,10 @@ elastic.net <- function(x,
 ##'
 ##' @param intercept logical; indicates if an intercept should be
 ##' included in the model. Default is \code{TRUE}.
+##'
+##' @param normalize logical; indicates if variables should be
+##' normalized to have unit L2 norm before fitting.  Default is
+##' \code{TRUE}.
 ##'
 ##' @param naive logical; Compute either 'naive' of 'classic' bounded
 ##' regression: mimicing the Elastic-net, the vector of parameters is
@@ -410,6 +442,7 @@ bounded.reg <- function(x,
                         penscale  = rep(1,p),
                         struct    = NULL,
                         intercept = TRUE,
+                        normalize = TRUE,
                         naive     = FALSE,
                         nlambda1  = ifelse(is.null(lambda1),100,length(lambda1)),
                         min.ratio = ifelse(n<=p,1e-2,1e-3),
@@ -422,8 +455,10 @@ bounded.reg <- function(x,
   p <- ncol(x) # problem size
   n <- nrow(x) # sample size
   if (checkargs) {
-    if(!inherits(x, c("matrix", "Matrix")))
-      stop("x has to be of class 'matrix', 'dgeMatrix' or 'dgCMatrix'.")
+    if (is.data.frame(x))
+      x <- as.matrix(x)
+    if(!inherits(x, c("matrix", "dgCMatrix")))
+      stop("x has to be of class 'matrix' or 'dgCMatrix'.")
     if(any(is.na(x)))
       stop("NA value in x not allowed.")
     if(!is.numeric(y))
@@ -451,6 +486,8 @@ bounded.reg <- function(x,
         stop("struct must be a (square) positive definite matrix.")
       if (any(eigen(struct,only.values=TRUE)$values<=.Machine$double.eps))
         stop("struct must be a (square) positive definite matrix.")
+      if(!inherits(struct, "dgCMatrix"))
+        struct <- as(struct, "dgCMatrix")
     }
     if (length(max.feat)>1)
       stop("max.feat must be an integer.")
@@ -458,7 +495,8 @@ bounded.reg <- function(x,
       max.feat <- as.integer(max.feat)
   }
 
-  return(quadrupen(x=x,
+  return(quadrupen(beta0 = NULL,
+                   x=x,
                    y=y,
                    penalty   = "bounded.reg",
                    lambda1   = lambda1,
@@ -466,6 +504,7 @@ bounded.reg <- function(x,
                    penscale  = penscale,
                    struct    = struct,
                    intercept = intercept,
+                   normalize = normalize,
                    naive     = naive,
                    nlambda1  = nlambda1,
                    min.ratio = min.ratio,
@@ -474,14 +513,16 @@ bounded.reg <- function(x,
          )
 }
 
-quadrupen <- function(x,
-                      y,
+quadrupen <- function(beta0    ,
+                      x        ,
+                      y        ,
                       penalty  ,
                       lambda1  ,
                       lambda2  ,
                       penscale ,
                       struct   ,
                       intercept,
+                      normalize,
                       naive    ,
                       nlambda1 ,
                       min.ratio,
@@ -500,56 +541,31 @@ quadrupen <- function(x,
   }
   ctrl <- list(verbose      = 1, # default control options
                timer        =  FALSE,
-               max.iter     = 500,
+               max.iter     = max(500,p),
                method       = "quadra",
                threshold    = ifelse(quadra, 1e-7, 1e-2),
                monitor      = 0,
                bulletproof  = TRUE,
-               call.from.mv = FALSE)
+               usechol      = TRUE)
   ctrl[names(control)] <- control # overwritten by user specifications
   if (ctrl$timer) {r.start <- proc.time()}
-
-  get.lambda1 <- switch(penalty,
-                        "elastic.net" = get.lambda1.l1,
-                        "bounded.reg" = get.lambda1.li)
-  ## ======================================================
-  ## INTERCEPT AND NORMALIZATION TREATMENT
-  input <- standardize(x,y,intercept,penscale,
-                       call.from.mv=ctrl$call.from.mv)
-
-  ## ======================================================
-  ## GENERATE A GRID OF PENALTY IF NONE HAS BEEN PROVIDED
-  if (is.null(lambda1))
-    lambda1 <- get.lambda1(input$xty,nlambda1,min.ratio)
-
-  ## ======================================================
-  ## STRUCTURATING MATRIX
-  if (is.null(struct))
-      struct <- sparseMatrix(i=1:p,j=1:p,x=rep(1,p))
-  if (lambda2 > 0) {
-    D <- Diagonal(x=1/penscale) ## renormalize the l2 structruring
-                                ## matrix according to the l1 penscale
-                                ## values, so as it does not interfere
-                                ## with the l2 penalty
-    struct <- D %*% as(struct, "dgCMatrix") %*% D
-    S <- list(Si = struct@i, Sp = struct@p, Sx = lambda2*struct@x)
-  } else {
-    S <- NULL
-  }
 
   ## ======================================================
   ## STARTING C++ CALL TO ENET_LS
   if (ctrl$timer) {cpp.start <- proc.time()}
   if (penalty == "elastic.net") {
     out <- .Call("elastic_net",
-                 input$x      ,
-                 input$xty    ,
-                 S            ,
+                 beta0        ,
+                 x            ,
+                 y            ,
+                 struct       ,
                  lambda1      ,
+                 nlambda1     ,
+                 min.ratio    ,
+                 penscale     ,
                  lambda2      ,
-                 input$xbar   ,
-                 input$normx  ,
-                 input$normy  ,
+                 intercept    ,
+                 normalize    ,
                  rep(1,n)     ,
                  naive        ,
                  ctrl$thresh  ,
@@ -561,6 +577,7 @@ quadrupen <- function(x,
                         fista    = 2, 0),
                  ctrl$verbose,
                  inherits(x, "sparseMatrix"),
+                 ctrl$usechol,
                  ctrl$monitor,
                  package = "quadrupen")
     coefficients <- sparseMatrix(i = out$iA+1,
@@ -573,20 +590,24 @@ quadrupen <- function(x,
   }
   if (penalty == "bounded.reg") {
     out <- .Call("bounded_reg",
-                 input$x$Xx,
-                 input$xty,
-                 as.matrix(struct),
-                 lambda1,
-                 lambda2,
-                 input$xbar,
-                 input$normx,
-                 rep(1,n),
-                 naive,
-                 ctrl$thresh,
+                 x,
+                 y,
+                 struct,
+                 lambda1      ,
+                 nlambda1     ,
+                 min.ratio    ,
+                 penscale     ,
+                 lambda2      ,
+                 intercept    ,
+                 normalize    ,
+                 rep(1,n)     ,
+                 naive        ,
+                 ctrl$thresh  ,
                  ctrl$max.iter,
-                 max.feat,
+                 max.feat     ,
                  ifelse(ctrl$method=="fista",1,0),
                  ctrl$verbose,
+                 inherits(x, "sparseMatrix"),
                  ctrl$bulletproof,
                  package = "quadrupen")
     coefficients <- Matrix(out$coefficients)
@@ -624,33 +645,29 @@ quadrupen <- function(x,
   dim.names <- list()
   dimnames(coefficients)[[1]] <- round(c(out$lambda1),3)
   dimnames(coefficients)[[2]] <- 1:p
-
-  ## Renormalize according to the first penalty scale
-  if (any(penscale != 1)) {
-    coefficients <- sweep(coefficients, 2L, penscale,"/",check.margin=FALSE)
-  }
+  mu <- drop(out$mu)
 
   ## FITTED VALUES AND RESIDUALS...
-  meanx <- input$xbar*input$normx*penscale
   if (intercept) {
-    mu <- as.vector(input$ybar-coefficients %*% (input$xbar*penscale))
-    fitted <- sweep(x %*% t(coefficients),2L,-mu,check.margin=FALSE)
+    fitted <- sweep(tcrossprod(x,coefficients),2L,-mu,check.margin=FALSE)
   } else {
     mu <- 0
-    fitted <- x %*% t(coefficients)
+    fitted <- tcrossprod(x,coefficients)
   }
-
-  residuals <- matrix(rep(y, length(out$lambda1)), nrow=n) - fitted
+  residuals <- apply(fitted,2,function(y.hat) y-y.hat)
+  normy     <- ifelse(intercept,sum((y-mean(y))^2),sum(y^2))
+  r.squared <- 1-colSums(residuals^2)/normy
 
   return(new("quadrupen",
              coefficients = coefficients   ,
              active.set   = active.set     ,
              intercept    = intercept      ,
              mu           = mu             ,
-             meanx        = meanx          ,
-             normx        = input$normx    ,
+             meanx        = drop(out$meanx),
+             normx        = drop(out$normx),
              fitted       = fitted         ,
              residuals    = residuals      ,
+             r.squared    = r.squared      ,
              penscale     = penscale       ,
              penalty      = penalty        ,
              naive        = naive          ,
@@ -662,8 +679,7 @@ quadrupen <- function(x,
 
 }
 
-standardize <- function(x,y,intercept,penscale,zero=.Machine$double.eps,
-                        call.from.mv = FALSE) {
+standardize <- function(x,y,intercept,normalize,penscale,zero=.Machine$double.eps) {
 
   n <- length(y)
   p <- ncol(x)
@@ -679,35 +695,32 @@ standardize <- function(x,y,intercept,penscale,zero=.Machine$double.eps,
 
   ## ============================================
   ## NORMALIZATION
-  if (call.from.mv) { ## already scaled...
-    normx <- rep(1,p)
-  } else {
+  if (normalize) {
     normx <- sqrt(drop(colSums(x^2)- n*xbar^2))
     if (any(normx < zero)) {
       warning("A predictor has no signal: you should remove it.")
       normx[abs(normx) < zero] <- 1 ## dirty way to handle 0/0
     }
+    ## normalizing the predictors...
+    x <- sweep(x, 2L, normx, "/", check.margin = FALSE)
+    ## xbar is scaled to handle internaly the centering of X for
+    ## sparsity purpose
+    xbar <- xbar/normx
+  } else {
+    normx <- rep(1,p)
   }
-  ## xbar is scaled to handle internaly the centering of X for
-  ## sparsity purpose
-  xbar <- xbar/normx
   normy <- sqrt(sum(y^2))
 
-  ## normalizing the predictors...
-  x <- sweep(x, 2L, normx, "/", check.margin = FALSE)
   ## and now normalize predictors according to penscale value
   if (any(penscale != 1)) {
     x <- sweep(x, 2L, penscale, "/", check.margin=FALSE)
     xbar <- xbar/penscale
   }
-  ## Building the sparsely encoded design matrix
-  if (inherits(x, "sparseMatrix")) {
-    xs    <- as(x, "dgCMatrix")
-    x     <- list(Xi = xs@i, Xj = xs@p, Xnp = diff(xs@p), Xx = xs@x)
-    xty   <- drop(crossprod(y-ybar,scale(xs,xbar,FALSE)))
+  ## Computing marginal correlation
+  if (intercept) {
+    xty   <- drop(crossprod(y-ybar,sweep(x,2L,xbar)))
   } else {
-    x     <- list(Xx = as.matrix(x))
-    xty   <- drop(crossprod(y-ybar,scale(x$Xx,xbar,FALSE)))
+    xty   <- drop(crossprod(y,x))
   }
 
   return(list(xbar=xbar, ybar=ybar, normx=normx, normy=normy, xty=xty, x=x))

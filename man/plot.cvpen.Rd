@@ -1,7 +1,7 @@
 \docType{methods}
 \name{plot,cvpen-method}
-\alias{plot,cvpen-method}
 \alias{plot.cvpen}
+\alias{plot,cvpen-method}
 \title{Plot method for cross validated error of a \code{quadrupen} model}
 \arguments{
   \item{x}{output of a \code{crossval} run (must be of

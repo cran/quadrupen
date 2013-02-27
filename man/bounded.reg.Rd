@@ -4,7 +4,7 @@
 \usage{
   bounded.reg(x, y, lambda1 = NULL, lambda2 = 0.01,
     penscale = rep(1, p), struct = NULL, intercept = TRUE,
-    naive = FALSE,
+    normalize = TRUE, naive = FALSE,
     nlambda1 = ifelse(is.null(lambda1), 100, length(lambda1)),
     min.ratio = ifelse(n <= p, 0.01, 0.001),
     max.feat = ifelse(lambda2 < 0.01, min(n, p), min(4 * n, p)),
@@ -12,9 +12,8 @@
 }
 \arguments{
   \item{x}{matrix of features, possibly sparsely encoded
-  (experimental). Do NOT include intercept. Predictors are
-  normalized internally to have unit L2 norm before
-  fitting. Coefficients will then be rescaled to the
+  (experimental). Do NOT include intercept. When normalized
+  os \code{TRUE}, coefficients will then be rescaled to the
   original scale.}
 
   \item{y}{response vector.}
@@ -46,6 +45,10 @@
 
   \item{intercept}{logical; indicates if an intercept
   should be included in the model. Default is \code{TRUE}.}
+
+  \item{normalize}{logical; indicates if variables should
+  be normalized to have unit L2 norm before fitting.
+  Default is \code{TRUE}.}
 
   \item{naive}{logical; Compute either 'naive' of 'classic'
   bounded regression: mimicing the Elastic-net, the vector

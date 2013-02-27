@@ -1,7 +1,7 @@
 \docType{methods}
 \name{plot,stability.path-method}
-\alias{plot,stability.path-method}
 \alias{plot.stability.path}
+\alias{plot,stability.path-method}
 \title{Plot method for \code{stability.path}.}
 \arguments{
   \item{x}{output of a \code{stability} run (must be of
