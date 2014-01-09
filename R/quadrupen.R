@@ -27,11 +27,10 @@
 ##' \eqn{\ell_1}{l1}-penalty of each feature. Default set all weights
 ##' to 1.
 ##'
-##' @param struct matrix structuring the coefficients, possibly
-##' sparsely encoded. Must be at least positive semidefinite (this is
-##' checked internally if the \code{checkarg} argument is
-##' \code{TRUE}). If \code{NULL} (the default), the identity matrix is
-##' used. See details below.
+##' @param struct matrix structuring the coefficients (preferably
+##' sparse). Must be at least positive semidefinite (this is checked
+##' internally if the \code{checkarg} argument is \code{TRUE}). The
+##' default uses the identity matrix. See details below.
 ##'
 ##' @param intercept logical; indicates if an intercept should be
 ##' included in the model. Default is \code{TRUE}.
@@ -130,7 +129,7 @@
 ##' \code{Matrix}).
 ##'
 ##' @seealso See also \code{\linkS4class{quadrupen}},
-##' \code{\link{plot.quadrupen}} and \code{\link{crossval}}.
+##' \code{\link{plot,quadrupen-method}} and \code{\link{crossval}}.
 ##' @name elastic.net
 ##' @rdname elastic.net
 ##' @keywords models, regression
@@ -148,28 +147,11 @@
 ##' x <- as.matrix(matrix(rnorm(95*n),n,95) %*% chol(Sigma))
 ##' y <- 10 + x %*% beta + rnorm(n,0,10)
 ##'
-##' ## Structured Elastic.net
-##' p <- ncol(x)
-##' C <- bandSparse(p,k=0:1,diagonals=list(rep(1,p),rep(-1,p-1)))
-##'
-##' ## This gives a great advantage to the elastic-net
-##' ## for support recovery
-##' beta.lasso <- slot(crossval(x,y,lambda2=0 , mc.cores=2) , "beta.min")
-##' beta.enet  <- slot(crossval(x,y,lambda2=10, mc.cores=2), "beta.min")
-##' beta.struc <- slot(crossval(x,y,lambda2=10, mc.cores=2, struct=t(C) %*% C), "beta.min")
-##'
-##' cat("\nFalse positives for the Lasso:", sum(sign(beta) != sign(beta.lasso)))
-##' cat("\nFalse positives for the Elastic-net:", sum(sign(beta) != sign(beta.enet)))
-##' cat("\nDONE.\n")
-##'
 ##' labels <- rep("irrelevant", length(beta))
 ##' labels[beta != 0] <- "relevant"
-##' ## Comparing the solution path pf the LASSO, the Elastic-net and the
-##' ## Structured Elastic-net
+##' ## Comparing the solution path of the LASSO and the Elastic-net
 ##' plot(elastic.net(x,y,lambda2=0), label=labels) ## a mess
 ##' plot(elastic.net(x,y,lambda2=10), label=labels) ## a lot better
-##' plot(elastic.net(x,y,lambda2=10,struct=solve(Sigma)), label=labels) ## even better
-##'
 ##'
 ##' @export
 elastic.net <- function(x,
@@ -228,7 +210,7 @@ elastic.net <- function(x,
           stop("struct must be a (square) positive semidefinite matrix.")
       if(!inherits(struct, "dgCMatrix"))
           struct <- as(struct, "dgCMatrix")
-    }
+    }      
     if (!is.null(beta0)) {
       beta0 <- as.numeric(beta0)
       if (length(beta0) != p)
@@ -291,11 +273,10 @@ elastic.net <- function(x,
 ##' infinity norm of each feature. Default set all weights to 1. See
 ##' details below.
 ##'
-##' @param struct matrix structuring the coefficients, possibly
-##' sparsely encoded.  Must be at least positive semidefinite (this is
-##' checked internally if the \code{checkarg} argument is
-##' \code{TRUE}).  If \code{NULL} (the default), the identity matrix
-##' is used. See details below.
+##' @param struct matrix structuring the coefficients.  Must be at
+##' least positive semidefinite (this is checked internally if the
+##' \code{checkarg} argument is \code{TRUE}). The
+##' default uses the identity matrix. See details below.
 ##'
 ##' @param intercept logical; indicates if an intercept should be
 ##' included in the model. Default is \code{TRUE}.
@@ -407,7 +388,7 @@ elastic.net <- function(x,
 ##' a larger \code{'min.ratio'} argument.
 ##'
 ##' @seealso See also \code{\linkS4class{quadrupen}},
-##' \code{\link{plot.quadrupen}} and \code{\link{crossval}}.
+##' \code{\link{plot,quadrupen-method}} and \code{\link{crossval}}.
 ##' @name bounded.reg
 ##' @rdname bounded.reg
 ##' @keywords models, regression
@@ -431,8 +412,6 @@ elastic.net <- function(x,
 ##' labels[beta != 0] <- "relevant"
 ##' plot(bounded.reg(x,y,lambda2=0) , label=labels) ## a mess
 ##' plot(bounded.reg(x,y,lambda2=10), label=labels) ## good guys are at the boundaries
-##' plot(bounded.reg(x,y,lambda2=10,struct=solve(Sigma)), label=labels) ## even better
-##'
 ##'
 ##' @export
 bounded.reg <- function(x,
@@ -489,6 +468,7 @@ bounded.reg <- function(x,
       if(!inherits(struct, "dgCMatrix"))
         struct <- as(struct, "dgCMatrix")
     }
+    
     if (length(max.feat)>1)
       stop("max.feat must be an integer.")
     if(is.numeric(max.feat) & !is.integer(max.feat))

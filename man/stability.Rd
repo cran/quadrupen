@@ -2,12 +2,10 @@
 \alias{stability}
 \title{Stability selection for a quadrupen fit.}
 \usage{
-  stability(x, y,
-    penalty = c("elastic.net", "bounded.reg"),
-    subsamples = 100, sample.size = floor(n/2),
-    randomize = TRUE, weakness = 0.5, verbose = TRUE,
-    folds = replicate(subsamples, sample(1:nrow(x), sample.size), simplify = FALSE),
-    mc.cores = detectCores(), ...)
+stability(x, y, penalty = c("elastic.net", "bounded.reg"), subsamples = 100,
+  sample.size = floor(n/2), randomize = TRUE, weakness = 0.5,
+  verbose = TRUE, folds = replicate(subsamples, sample(1:nrow(x),
+  sample.size), simplify = FALSE), mc.cores = detectCores(), ...)
 }
 \arguments{
   \item{x}{matrix of features, possibly sparsely encoded
@@ -51,36 +49,36 @@
   \code{\link{bounded.reg}})}
 }
 \value{
-  An object of class \code{\linkS4class{stability.path}}.
+An object of class \code{\linkS4class{stability.path}}.
 }
 \description{
-  Compute the stability path of a (possibly randomized)
-  fitting procedure as introduced by Meinshausen and
-  Buhlmann (2010).
+Compute the stability path of a (possibly randomized)
+fitting procedure as introduced by Meinshausen and Buhlmann
+(2010).
 }
 \note{
-  When \code{randomized = TRUE}, the \code{penscale}
-  argument that weights the penalty tuned by
-  \eqn{\lambda_1}{lambda1} is perturbed (divided) for each
-  subsample by a random variable uniformly distributed on
-  \if{latex}{\eqn{[\alpha,1]}}\if{html}{[&#945;,1]}\if{text}{\eqn{[alpha,1]}},
-  where
-  \if{latex}{\eqn{\alpha}}\if{html}{&#945;}\if{text}{\eqn{alpha}}
-  is the weakness parameter.
+When \code{randomized = TRUE}, the \code{penscale} argument
+that weights the penalty tuned by \eqn{\lambda_1}{lambda1}
+is perturbed (divided) for each subsample by a random
+variable uniformly distributed on
+\if{latex}{\eqn{[\alpha,1]}}\if{html}{[&#945;,1]}\if{text}{\eqn{[alpha,1]}},
+where
+\if{latex}{\eqn{\alpha}}\if{html}{&#945;}\if{text}{\eqn{alpha}}
+is the weakness parameter.
 
-  If the user runs the fitting method with option
-  \code{'bulletproof'} set to \code{FALSE}, the algorithm
-  may stop at an early stage of the path. Early stops of
-  the underlying fitting function are handled internally,
-  in the following way: we chose to simply skip the results
-  associated with such runs, in order not to bias the
-  stability selection procedure. If it occurs too often, a
-  warning is sent to the user, in which case you should
-  reconsider the grid of \code{lambda1} for stability
-  selection. If \code{bulletproof} is \code{TRUE} (the
-  default), there is nothing to worry about, except a
-  possible slow down when any switching to the proximal
-  algorithm is required.
+If the user runs the fitting method with option
+\code{'bulletproof'} set to \code{FALSE}, the algorithm may
+stop at an early stage of the path. Early stops of the
+underlying fitting function are handled internally, in the
+following way: we chose to simply skip the results
+associated with such runs, in order not to bias the
+stability selection procedure. If it occurs too often, a
+warning is sent to the user, in which case you should
+reconsider the grid of \code{lambda1} for stability
+selection. If \code{bulletproof} is \code{TRUE} (the
+default), there is nothing to worry about, except a
+possible slow down when any switching to the proximal
+algorithm is required.
 }
 \examples{
 \dontrun{
@@ -112,12 +110,12 @@ cat("\\nDONE.\\n")
 }
 }
 \references{
-  N. Meinshausen and P. Buhlmann (2010). Stability
-  Selection, JRSS(B).
+N. Meinshausen and P. Buhlmann (2010). Stability Selection,
+JRSS(B).
 }
 \seealso{
-  \code{\linkS4class{stability.path}} and
-  \code{\link{plot.stability.path}}.
+\code{\linkS4class{stability.path}} and
+\code{\link{plot,stability.path-method}}.
 }
 \keyword{models,}
 \keyword{regression}

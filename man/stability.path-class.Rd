@@ -5,9 +5,8 @@
 \alias{stability.path-class}
 \title{Class "stability.path"}
 \description{
-  Class of object returned by the \code{stability}
-  function, with methods \code{print}, \code{show} and
-  \code{plot}.
+Class of object returned by the \code{stability} function,
+with methods \code{print}, \code{show} and \code{plot}.
 }
 \section{Slots}{
   \describe{
@@ -25,8 +24,8 @@
   list that contains the folds used for each subsample.} }
 }
 \seealso{
-  See also \code{\link{plot.stability.path}}, and
-  \code{\link{stability}}.
+See also \code{\link{plot,stability.path-method}}, and
+\code{\link{stability}}.
 }
 \keyword{class}
 

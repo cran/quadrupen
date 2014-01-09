@@ -45,7 +45,7 @@ void choldowndate(mat &R, int j) {
 }
 
 
-void add_var_enet(uword &n, int &nbr_in, uword &var_in, vec &betaA, uvec &A, mat &x, mat &xt, mat &xtxA, mat &xAtxA, mat &xtxw, mat &R, double &lambda2, vec &xbar, sp_mat &spS, bool &usechol, uword &fun) {
+void add_var_enet(uword &n, int &nbr_in, uword &var_in, vec &betaA, uvec &A, mat &x, mat &xt, mat &xtxA, mat &xAtxA, mat &xtxw, mat &R, double &lambda2, vec &xbar, sp_mat &S, bool &usechol, uword &fun) {
 
   vec  new_col   ; // column currently added to xtxA
 
@@ -57,7 +57,7 @@ void add_var_enet(uword &n, int &nbr_in, uword &var_in, vec &betaA, uvec &A, mat
   new_col = xt * x.col(var_in);
   if (lambda2 > 0) {
     // Adding the column corresponding to the structurating matrix
-    new_col += spS.col(var_in);
+    new_col += S.col(var_in);
   }
 
   // UPDATE THE xtxA AND xAtxA MATRICES
@@ -77,7 +77,7 @@ void add_var_enet(uword &n, int &nbr_in, uword &var_in, vec &betaA, uvec &A, mat
   }
 }
 
-void add_var_enet(uword &n, int &nbr_in, uword &var_in, vec &betaA, uvec &A, sp_mat &x, sp_mat &xt, mat &xtxA, mat &xAtxA, mat &xtxw, mat &R, double &lambda2, vec &xbar, sp_mat &spS, bool &usechol, uword &fun) {
+void add_var_enet(uword &n, int &nbr_in, uword &var_in, vec &betaA, uvec &A, sp_mat &x, sp_mat &xt, mat &xtxA, mat &xAtxA, mat &xtxw, mat &R, double &lambda2, vec &xbar, sp_mat &S, bool &usechol, uword &fun) {
 
   vec  new_col   ; // column currently added to xtxA
 
@@ -89,7 +89,7 @@ void add_var_enet(uword &n, int &nbr_in, uword &var_in, vec &betaA, uvec &A, sp_
   new_col = xt * x.col(var_in) - n * xbar * as_scalar(xbar[var_in]);
   if (lambda2 > 0) {
     // Adding the column corresponding to the structurating matrix
-    new_col += spS.col(var_in);
+    new_col += S.col(var_in);
   }
 
   // UPDATE THE xtxA AND xAtxA MATRICES

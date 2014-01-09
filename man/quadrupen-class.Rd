@@ -9,9 +9,9 @@
 \alias{show,quadrupen-method}
 \title{Class "quadrupen"}
 \description{
-  Class of object returned by any fitting function of the
-  \pkg{quadrupen} package (\code{elastic.net} or
-  \code{bounded.reg}).
+Class of object returned by any fitting function of the
+\pkg{quadrupen} package (\code{elastic.net} or
+\code{bounded.reg}).
 }
 \section{Slots}{
   \describe{
@@ -94,10 +94,10 @@
   generic (undocumented) methods.
 
   A specific plotting method is available and documented
-  (\code{\link{plot.quadrupen}}).
+  (\code{\link{plot,quadrupen-method}}).
 }
 \seealso{
-  See also \code{\link{plot.quadrupen}}.
+See also \code{\link{plot,quadrupen-method}}.
 }
 \keyword{class}
 

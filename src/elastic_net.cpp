@@ -82,7 +82,17 @@ SEXP elastic_net(SEXP BETA0    ,
   meanx = xbar % penscale % normx;
 
   // STRUCTURATING MATRIX
-  sp_mat S = get_struct(STRUCT, lambda2, penscale) ; // sparsely encoded structuring matrix
+  sp_mat S ;
+  if (STRUCT == R_NilValue | lambda2 == 0) {
+    S = speye<sp_mat>(p,p);
+  } else {
+    S = as<sp_mat> (STRUCT) ;
+  }
+  if (lambda2 > 0) {
+    // renormalize the l2 structuring matrix according to the l1
+    // penscale values, so as it does not interfer with the l2 penalty.
+    S = diagmat(sqrt(lambda2)*pow(penscale,-1/2)) * S * diagmat(sqrt(lambda2)*pow(penscale,-1/2)) ;
+  }
 
   // VECTOR OF TUNING PARAMETER FOR THE L1-PENALTY
   vec lambda1 = get_lambda1(LAMBDA1, N_LAMBDA, MIN_RATIO, max(abs(xty)));

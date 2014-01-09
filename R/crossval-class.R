@@ -31,13 +31,13 @@
 ##'
 ##' }
 ##'
-##' The specific \code{\link{plot.cvpen}} method is documented.
+##' The specific \code{\link{plot,cvpen-method}} method is documented.
 ##'
 ##' @docType class
 ##'
 ##' @keywords class
 ##'
-##' @seealso See also \code{\link{plot.cvpen}} and
+##' @seealso See also \code{\link{plot,cvpen-method}} and
 ##' \code{\link{crossval}}.
 ##'
 ##' @name cvpen-class
@@ -64,16 +64,12 @@ setClass("cvpen",
 ##' Produce a plot of the cross validated error of a \code{quadrupen}
 ##' model.
 ##'
-##' @usage plot.cvpen(x, y, log.scale=TRUE, reverse=FALSE,
+##' @usage \\S4method{plot}{cvpen}(x, y, log.scale=TRUE, reverse=FALSE,
 ##' plot=TRUE, main = "Cross-validation error", ...)
 ##' @param x output of a \code{crossval} run (must be of class
 ##' \code{cvpen}).
 ##' @param y used for S4 compatibility.
 ##' @param main the main title, with a hopefully appropriate default definition.
-##' @param xvar variable to plot on the X-axis: either \code{"lambda"}
-##' (\eqn{\lambda_1}{lambda1} penalty level) or \code{"fraction"}
-##' (fraction of \eqn{\ell_1}{l1}-norm of the shruken
-##' coefficients). Default is set to \code{"lambda"}.
 ##' @param log.scale logical; indicates if a log-scale should be used
 ##' when \code{xvar="lambda"}. Ignored for 2D cross-validation plot.
 ##' @param plot logical; indicates if the graph should be plotted. Default is \code{TRUE}.

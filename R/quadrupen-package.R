@@ -150,7 +150,6 @@
 ##' \item  Robert Tibshirani. Regression Shrinkage and Selection
 ##' via the Lasso, JRSS(B), 1996.
 ##' }
-##' @import Matrix Rcpp RcppArmadillo parallel ggplot2 reshape2 scales
-##' grid
+##' @import Matrix parallel Rcpp methods ggplot2 reshape2 scales grid
 ##' @useDynLib quadrupen
 NULL

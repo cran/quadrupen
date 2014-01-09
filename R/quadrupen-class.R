@@ -74,7 +74,7 @@
 ##' \code{deviance(object, ...)} generic (undocumented) methods.
 ##'
 ##' A specific plotting method is available and documented
-##' (\code{\link{plot.quadrupen}}).
+##' (\code{\link{plot,quadrupen-method}}).
 ##'
 ##' @aliases fitted,quadrupen-method predict,quadrupen-method
 ##' deviance,quadrupen-method print,quadrupen-method
@@ -84,7 +84,7 @@
 ##'
 ##' @keywords class
 ##'
-##' @seealso See also \code{\link{plot.quadrupen}}.
+##' @seealso See also \code{\link{plot,quadrupen-method}}.
 ##'
 ##' @name quadrupen-class
 ##' @rdname quadrupen-class
@@ -153,7 +153,7 @@ setMethod("show", "quadrupen", definition =
 ##'
 ##' Produce a plot of the solution path of a \code{quadrupen} fit.
 ##'
-##' @usage plot.quadrupen(x, y, xvar = "lambda",
+##' @usage \\S4method{plot}{quadrupen}(x, y, xvar = "lambda",
 ##'         main = paste(slot(x, "penalty")," path", sep=""),
 ##'         log.scale = TRUE, standardize=TRUE, reverse=FALSE,
 ##'         labels = NULL, plot = TRUE, ...)
@@ -173,7 +173,7 @@ setMethod("show", "quadrupen", definition =
 ##' plotting (with the norm of the predictor). Default is \code{TRUE}.
 ##' @param reverse logical; should the X-axis be reversed when
 ##' \code{xvar="lambda"}? Default is \code{FALSE}.
-##' @param label vector indicating the names associated to the plotted
+##' @param labels vector indicating the names associated to the plotted
 ##' variables. When specified, a legend is drawn in order to identify
 ##' each variable. Only relevant when the number of predictor is
 ##' small. Remind that the intercept does not count. Default is

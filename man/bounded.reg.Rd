@@ -2,13 +2,11 @@
 \alias{bounded.reg}
 \title{Fit a linear model with infinity-norm plus ridge-like regularization}
 \usage{
-  bounded.reg(x, y, lambda1 = NULL, lambda2 = 0.01,
-    penscale = rep(1, p), struct = NULL, intercept = TRUE,
-    normalize = TRUE, naive = FALSE,
-    nlambda1 = ifelse(is.null(lambda1), 100, length(lambda1)),
-    min.ratio = ifelse(n <= p, 0.01, 0.001),
-    max.feat = ifelse(lambda2 < 0.01, min(n, p), min(4 * n, p)),
-    control = list(), checkargs = TRUE)
+bounded.reg(x, y, lambda1 = NULL, lambda2 = 0.01, penscale = rep(1, p),
+  struct = NULL, intercept = TRUE, normalize = TRUE, naive = FALSE,
+  nlambda1 = ifelse(is.null(lambda1), 100, length(lambda1)),
+  min.ratio = ifelse(n <= p, 0.01, 0.001), max.feat = ifelse(lambda2 < 0.01,
+  min(n, p), min(4 * n, p)), control = list(), checkargs = TRUE)
 }
 \arguments{
   \item{x}{matrix of features, possibly sparsely encoded
@@ -36,12 +34,11 @@
   weight the infinity norm of each feature. Default set all
   weights to 1. See details below.}
 
-  \item{struct}{matrix structuring the coefficients,
-  possibly sparsely encoded.  Must be at least positive
-  semidefinite (this is checked internally if the
-  \code{checkarg} argument is \code{TRUE}).  If \code{NULL}
-  (the default), the identity matrix is used. See details
-  below.}
+  \item{struct}{matrix structuring the coefficients.  Must
+  be at least positive semidefinite (this is checked
+  internally if the \code{checkarg} argument is
+  \code{TRUE}). The default uses the identity matrix. See
+  details below.}
 
   \item{intercept}{logical; indicates if an intercept
   should be included in the model. Default is \code{TRUE}.}
@@ -119,61 +116,60 @@
   procedures.}
 }
 \value{
-  an object with class \code{quadrupen}, see the
-  documentation page \code{\linkS4class{quadrupen}} for
-  details.
+an object with class \code{quadrupen}, see the
+documentation page \code{\linkS4class{quadrupen}} for
+details.
 }
 \description{
-  Adjust a linear model penalized by a mixture of a
-  (possibly weighted) \eqn{\ell_\infty}{l-infinity}-norm
-  (bounding the magnitude of the parameters) and a
-  (possibly structured) \eqn{\ell_2}{l2}-norm (ridge-like).
-  The solution path is computed at a grid of values for the
-  infinity-penalty, fixing the amount of \eqn{\ell_2}{l2}
-  regularization. See details for the criterion optimized.
+Adjust a linear model penalized by a mixture of a (possibly
+weighted) \eqn{\ell_\infty}{l-infinity}-norm (bounding the
+magnitude of the parameters) and a (possibly structured)
+\eqn{\ell_2}{l2}-norm (ridge-like). The solution path is
+computed at a grid of values for the infinity-penalty,
+fixing the amount of \eqn{\ell_2}{l2} regularization. See
+details for the criterion optimized.
 }
 \note{
-  The optimized criterion is \if{latex}{\deqn{%
-  \hat{\beta}_{\lambda_1,\lambda_1} = \arg \min_{\beta}
-  \frac{1}{2} (y - X \beta)^T (y - X \beta) + \lambda_1 \|D
-  \beta \|_{\infty} + \frac{\lambda_2}{2} \beta^T S \beta,
-  }} \if{html}{\out{ <center> &beta;<sup>hat</sup>
-  <sub>&lambda;<sub>1</sub>,&lambda;<sub>2</sub></sub> =
-  argmin<sub>&beta;</sub> 1/2 RSS(&beta) +
-  &lambda;<sub>1</sub> &#124; D &beta;
-  &#124;<sub>&infin;</sub> + &lambda;/2 <sub>2</sub>
-  &beta;<sup>T</sup> S &beta;, </center> }}
-  \if{text}{\deqn{beta.hat(lambda1, lambda2) = argmin_beta
-  1/2 RSS(beta) + lambda1 max|D beta| + lambda2 beta' S
-  beta,}} where \eqn{D}{D} is a diagonal matrix, whose
-  diagonal terms are provided as a vector by the
-  \code{penscale} argument. The \eqn{\ell_2}{l2}
-  structuring matrix \eqn{S}{S} is provided via the
-  \code{struct} argument, a positive semidefinite matrix
-  (possibly of class \code{Matrix}).
+The optimized criterion is \if{latex}{\deqn{%
+\hat{\beta}_{\lambda_1,\lambda_1} = \arg \min_{\beta}
+\frac{1}{2} (y - X \beta)^T (y - X \beta) + \lambda_1 \|D
+\beta \|_{\infty} + \frac{\lambda_2}{2} \beta^T S \beta, }}
+\if{html}{\out{ <center> &beta;<sup>hat</sup>
+<sub>&lambda;<sub>1</sub>,&lambda;<sub>2</sub></sub> =
+argmin<sub>&beta;</sub> 1/2 RSS(&beta) +
+&lambda;<sub>1</sub> &#124; D &beta;
+&#124;<sub>&infin;</sub> + &lambda;/2 <sub>2</sub>
+&beta;<sup>T</sup> S &beta;, </center> }}
+\if{text}{\deqn{beta.hat(lambda1, lambda2) = argmin_beta
+1/2 RSS(beta) + lambda1 max|D beta| + lambda2 beta' S
+beta,}} where \eqn{D}{D} is a diagonal matrix, whose
+diagonal terms are provided as a vector by the
+\code{penscale} argument. The \eqn{\ell_2}{l2} structuring
+matrix \eqn{S}{S} is provided via the \code{struct}
+argument, a positive semidefinite matrix (possibly of class
+\code{Matrix}).
 
-  Note that the quadratic algorithm for the bounded
-  regression may become unstable along the path because of
-  singularity of the underlying problem, e.g. when there
-  are too much correlation or when the size of the problem
-  is close to or smaller than the sample size. In such
-  cases, it might be a good idea to switch to the proximal
-  solver, slower yet more robust. This is the strategy
-  adopted by the \code{'bulletproof'} mode, that will send
-  a warning while switching the method to \code{'fista'}
-  and keep on optimizing on the remainder of the path. When
-  \code{bulletproof} is set to \code{FALSE}, the algorithm
-  stops at an early stage of the path of solutions. Hence,
-  users should be careful when manipulating the resulting
-  \code{'quadrupen'} object, as it will not have the size
-  expected regarding the dimension of the \code{lambda1}
-  argument.
+Note that the quadratic algorithm for the bounded
+regression may become unstable along the path because of
+singularity of the underlying problem, e.g. when there are
+too much correlation or when the size of the problem is
+close to or smaller than the sample size. In such cases, it
+might be a good idea to switch to the proximal solver,
+slower yet more robust. This is the strategy adopted by the
+\code{'bulletproof'} mode, that will send a warning while
+switching the method to \code{'fista'} and keep on
+optimizing on the remainder of the path. When
+\code{bulletproof} is set to \code{FALSE}, the algorithm
+stops at an early stage of the path of solutions. Hence,
+users should be careful when manipulating the resulting
+\code{'quadrupen'} object, as it will not have the size
+expected regarding the dimension of the \code{lambda1}
+argument.
 
-  Singularity of the system can also be avoided with a
-  larger \eqn{\ell_2}{l2}-regularization, via
-  \code{lambda2}, or a "not-too-small"
-  \eqn{\ell_\infty}{l-infinity} regularization, via a
-  larger \code{'min.ratio'} argument.
+Singularity of the system can also be avoided with a larger
+\eqn{\ell_2}{l2}-regularization, via \code{lambda2}, or a
+"not-too-small" \eqn{\ell_\infty}{l-infinity}
+regularization, via a larger \code{'min.ratio'} argument.
 }
 \examples{
 ## Simulating multivariate Gaussian with blockwise correlation
@@ -194,11 +190,11 @@ labels <- rep("irrelevant", length(beta))
 labels[beta != 0] <- "relevant"
 plot(bounded.reg(x,y,lambda2=0) , label=labels) ## a mess
 plot(bounded.reg(x,y,lambda2=10), label=labels) ## good guys are at the boundaries
-plot(bounded.reg(x,y,lambda2=10,struct=solve(Sigma)), label=labels) ## even better
 }
 \seealso{
-  See also \code{\linkS4class{quadrupen}},
-  \code{\link{plot.quadrupen}} and \code{\link{crossval}}.
+See also \code{\linkS4class{quadrupen}},
+\code{\link{plot,quadrupen-method}} and
+\code{\link{crossval}}.
 }
 \keyword{models,}
 \keyword{regression}

@@ -3,8 +3,8 @@
 \alias{cvpen-class}
 \title{Class "cvpen"}
 \description{
-  Class of object returned by a cross-validation performed
-  through the \code{crossval} method.
+Class of object returned by a cross-validation performed
+through the \code{crossval} method.
 }
 \section{Slots}{
   \describe{ \item{\code{lambda1}:}{vector of
@@ -38,12 +38,12 @@
 
   }
 
-  The specific \code{\link{plot.cvpen}} method is
+  The specific \code{\link{plot,cvpen-method}} method is
   documented.
 }
 \seealso{
-  See also \code{\link{plot.cvpen}} and
-  \code{\link{crossval}}.
+See also \code{\link{plot,cvpen-method}} and
+\code{\link{crossval}}.
 }
 \keyword{class}
 

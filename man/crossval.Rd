@@ -2,11 +2,9 @@
 \alias{crossval}
 \title{Cross-validation function for quadrupen fitting methods.}
 \usage{
-  crossval(x, y, penalty = c("elastic.net", "bounded.reg"),
-    K = 10,
-    folds = split(sample(1:nrow(x)), rep(1:K, length = nrow(x))),
-    lambda2 = 0.01, verbose = TRUE,
-    mc.cores = detectCores(), ...)
+crossval(x, y, penalty = c("elastic.net", "bounded.reg"), K = 10,
+  folds = split(sample(1:nrow(x)), rep(1:K, length = nrow(x))),
+  lambda2 = 0.01, verbose = TRUE, mc.cores = detectCores(), ...)
 }
 \arguments{
   \item{penalty}{a string for the fitting procedure used
@@ -49,32 +47,31 @@
   \code{\link{bounded.reg}}).}
 }
 \value{
-  An object of class "cvpen" for which a \code{plot} method
-  is available.
+An object of class "cvpen" for which a \code{plot} method
+is available.
 }
 \description{
-  Function that computes K-fold (double) cross-validated
-  error of a \code{quadrupen} fit. If no \code{lambda2} is
-  provided, simple cross validation on the \code{lambda1}
-  parameter is performed. If a vector \code{lambda2} is
-  passed as an argument, double cross-validation is
-  performed.
+Function that computes K-fold (double) cross-validated
+error of a \code{quadrupen} fit. If no \code{lambda2} is
+provided, simple cross validation on the \code{lambda1}
+parameter is performed. If a vector \code{lambda2} is
+passed as an argument, double cross-validation is
+performed.
 }
 \note{
-  If the user runs the fitting method with option
-  \code{'bulletproof'} set to \code{FALSE}, the algorithm
-  may stop at an early stage of the path. Early stops are
-  handled internally, in order to provide results on the
-  same grid of penalty tuned by \eqn{\lambda_1}{lambda1}.
-  This is done by means of \code{NA} values, so as mean and
-  standard error are consistently evaluated. If, while
-  cross-validating, the procedure experiences too much
-  early stoppings, a warning is sent to the user, in which
-  case you should reconsider the grid of \code{lambda1}
-  used for the cross-validation.  If \code{bulletproof} is
-  \code{TRUE} (the default), there is nothing to worry
-  about, except a possible slow down when any switching to
-  the proximal algorithm is required.
+If the user runs the fitting method with option
+\code{'bulletproof'} set to \code{FALSE}, the algorithm may
+stop at an early stage of the path. Early stops are handled
+internally, in order to provide results on the same grid of
+penalty tuned by \eqn{\lambda_1}{lambda1}.  This is done by
+means of \code{NA} values, so as mean and standard error
+are consistently evaluated. If, while cross-validating, the
+procedure experiences too much early stoppings, a warning
+is sent to the user, in which case you should reconsider
+the grid of \code{lambda1} used for the cross-validation.
+If \code{bulletproof} is \code{TRUE} (the default), there
+is nothing to worry about, except a possible slow down when
+any switching to the proximal algorithm is required.
 }
 \examples{
 \dontrun{
@@ -111,8 +108,9 @@ cat("\\nFalse positives with the minimal LOO-CV choice: ", sum(sign(beta) != sig
 }
 }
 \seealso{
-  \code{\linkS4class{quadrupen}}, \code{\link{plot.cvpen}}
-  and \code{\linkS4class{cvpen}}.
+\code{\linkS4class{quadrupen}},
+\code{\link{plot,cvpen-method}} and
+\code{\linkS4class{cvpen}}.
 }
 \keyword{models,}
 \keyword{regression}

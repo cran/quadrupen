@@ -56,7 +56,7 @@
 ##' @return An object of class "cvpen" for which a \code{plot} method
 ##' is available.
 ##'
-##' @seealso \code{\linkS4class{quadrupen}}, \code{\link{plot.cvpen}}
+##' @seealso \code{\linkS4class{quadrupen}}, \code{\link{plot,cvpen-method}}
 ##' and \code{\linkS4class{cvpen}}.
 ##'
 ##' @examples \dontrun{
@@ -121,6 +121,7 @@ crossval <- function(x,
   user <- list(...)
   defs <- default.args(penalty,nrow(x)-max(sapply(folds,length)),ncol(x),user)
   args <- modifyList(defs, user)
+  
   ## Compute a grid of lambda1 (the same for each fold)
   if (is.null(args$lambda1)) {
     input <- standardize(x,y,args$intercept,args$normalize,args$penscale)

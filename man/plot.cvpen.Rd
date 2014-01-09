@@ -1,8 +1,11 @@
 \docType{methods}
 \name{plot,cvpen-method}
-\alias{plot.cvpen}
 \alias{plot,cvpen-method}
 \title{Plot method for cross validated error of a \code{quadrupen} model}
+\usage{
+\\S4method{plot}{cvpen}(x, y, log.scale=TRUE, reverse=FALSE,
+plot=TRUE, main = "Cross-validation error", ...)
+}
 \arguments{
   \item{x}{output of a \code{crossval} run (must be of
   class \code{cvpen}).}
@@ -11,12 +14,6 @@
 
   \item{main}{the main title, with a hopefully appropriate
   default definition.}
-
-  \item{xvar}{variable to plot on the X-axis: either
-  \code{"lambda"} (\eqn{\lambda_1}{lambda1} penalty level)
-  or \code{"fraction"} (fraction of \eqn{\ell_1}{l1}-norm
-  of the shruken coefficients). Default is set to
-  \code{"lambda"}.}
 
   \item{log.scale}{logical; indicates if a log-scale should
   be used when \code{xvar="lambda"}. Ignored for 2D
@@ -32,12 +29,12 @@
   \item{...}{used for S4 compatibility.}
 }
 \value{
-  a \pkg{ggplot2} object which can be plotted via the
-  \code{print} method.
+a \pkg{ggplot2} object which can be plotted via the
+\code{print} method.
 }
 \description{
-  Produce a plot of the cross validated error of a
-  \code{quadrupen} model.
+Produce a plot of the cross validated error of a
+\code{quadrupen} model.
 }
 \examples{
 \dontrun{

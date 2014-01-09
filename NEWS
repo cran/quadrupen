@@ -1,5 +1,10 @@
 NEWS/Changelog
 
+0.2-4	(2014-01-16)
+    Minor:
+    +   memory leak corrected (sp_mat declaration)
+    +   linking to Rcpp/RcppArmadillo headers (requires R 3.0-2)
+
 0.2-3	(2013-08-26)
     +   added back the 'normalize' parameter
     +   standardization is performed within the C++ code

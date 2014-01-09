@@ -67,7 +67,7 @@
 ##' Selection, JRSS(B).
 ##'
 ##' @seealso \code{\linkS4class{stability.path}} and
-##' \code{\link{plot.stability.path}}.
+##' \code{\link{plot,stability.path-method}}.
 ##'
 ##' @examples \dontrun{
 ##' ## Simulating multivariate Gaussian with blockwise correlation

@@ -2,13 +2,12 @@
 \alias{elastic.net}
 \title{Fit a linear model with elastic-net regularization}
 \usage{
-  elastic.net(x, y, lambda1 = NULL, lambda2 = 0.01,
-    penscale = rep(1, p), struct = NULL, intercept = TRUE,
-    normalize = TRUE, naive = FALSE,
-    nlambda1 = ifelse(is.null(lambda1), 100, length(lambda1)),
-    min.ratio = ifelse(n <= p, 0.01, 1e-04),
-    max.feat = ifelse(lambda2 < 0.01, min(n, p), min(4 * n, p)),
-    beta0 = NULL, control = list(), checkargs = TRUE)
+elastic.net(x, y, lambda1 = NULL, lambda2 = 0.01, penscale = rep(1, p),
+  struct = NULL, intercept = TRUE, normalize = TRUE, naive = FALSE,
+  nlambda1 = ifelse(is.null(lambda1), 100, length(lambda1)),
+  min.ratio = ifelse(n <= p, 0.01, 1e-04), max.feat = ifelse(lambda2 < 0.01,
+  min(n, p), min(4 * n, p)), beta0 = NULL, control = list(),
+  checkargs = TRUE)
 }
 \arguments{
   \item{x}{matrix of features, possibly sparsely encoded
@@ -33,12 +32,11 @@
   weight the \eqn{\ell_1}{l1}-penalty of each feature.
   Default set all weights to 1.}
 
-  \item{struct}{matrix structuring the coefficients,
-  possibly sparsely encoded. Must be at least positive
+  \item{struct}{matrix structuring the coefficients
+  (preferably sparse). Must be at least positive
   semidefinite (this is checked internally if the
-  \code{checkarg} argument is \code{TRUE}). If \code{NULL}
-  (the default), the identity matrix is used. See details
-  below.}
+  \code{checkarg} argument is \code{TRUE}). The default
+  uses the identity matrix. See details below.}
 
   \item{intercept}{logical; indicates if an intercept
   should be included in the model. Default is \code{TRUE}.}
@@ -122,38 +120,37 @@
   procedures.}
 }
 \value{
-  an object with class \code{quadrupen}, see the
-  documentation page \code{\linkS4class{quadrupen}} for
-  details.
+an object with class \code{quadrupen}, see the
+documentation page \code{\linkS4class{quadrupen}} for
+details.
 }
 \description{
-  Adjust a linear model with elastic-net regularization,
-  mixing a (possibly weighted) \eqn{\ell_1}{l1}-norm
-  (LASSO) and a (possibly structured) \eqn{\ell_2}{l2}-norm
-  (ridge-like). The solution path is computed at a grid of
-  values for the \eqn{\ell_1}{l1}-penalty, fixing the
-  amount of \eqn{\ell_2}{l2} regularization. See details
-  for the criterion optimized.
+Adjust a linear model with elastic-net regularization,
+mixing a (possibly weighted) \eqn{\ell_1}{l1}-norm (LASSO)
+and a (possibly structured) \eqn{\ell_2}{l2}-norm
+(ridge-like). The solution path is computed at a grid of
+values for the \eqn{\ell_1}{l1}-penalty, fixing the amount
+of \eqn{\ell_2}{l2} regularization. See details for the
+criterion optimized.
 }
 \note{
-  The optimized criterion is the following:
-  \if{latex}{\deqn{% \hat{\beta}_{\lambda_1,\lambda_1} =
-  \arg \min_{\beta} \frac{1}{2} (y - X \beta)^T (y - X
-  \beta) + \lambda_1 \|D \beta \|_{1} + \frac{\lambda_2}{2}
-  \beta^T S \beta, }} \if{html}{\out{ <center>
-  &beta;<sup>hat</sup>
-  <sub>&lambda;<sub>1</sub>,&lambda;<sub>2</sub></sub> =
-  argmin<sub>&beta;</sub> 1/2 RSS(&beta) +
-  &lambda;<sub>1</sub> &#124; D &beta; &#124;<sub>1</sub> +
-  &lambda;/2 <sub>2</sub> &beta;<sup>T</sup> S &beta;,
-  </center> }} \if{text}{\deqn{beta.hat(lambda1, lambda2) =
-  argmin_beta 1/2 RSS(beta) + lambda1 |D beta|1 + lambda2
-  beta' S beta,}} where \eqn{D}{D} is a diagonal matrix,
-  whose diagonal terms are provided as a vector by the
-  \code{penscale} argument. The \eqn{\ell_2}{l2}
-  structuring matrix \eqn{S}{S} is provided via the
-  \code{struct} argument, a positive semidefinite matrix
-  (possibly of class \code{Matrix}).
+The optimized criterion is the following:
+\if{latex}{\deqn{% \hat{\beta}_{\lambda_1,\lambda_1} = \arg
+\min_{\beta} \frac{1}{2} (y - X \beta)^T (y - X \beta) +
+\lambda_1 \|D \beta \|_{1} + \frac{\lambda_2}{2} \beta^T S
+\beta, }} \if{html}{\out{ <center> &beta;<sup>hat</sup>
+<sub>&lambda;<sub>1</sub>,&lambda;<sub>2</sub></sub> =
+argmin<sub>&beta;</sub> 1/2 RSS(&beta) +
+&lambda;<sub>1</sub> &#124; D &beta; &#124;<sub>1</sub> +
+&lambda;/2 <sub>2</sub> &beta;<sup>T</sup> S &beta;,
+</center> }} \if{text}{\deqn{beta.hat(lambda1, lambda2) =
+argmin_beta 1/2 RSS(beta) + lambda1 |D beta|1 + lambda2
+beta' S beta,}} where \eqn{D}{D} is a diagonal matrix,
+whose diagonal terms are provided as a vector by the
+\code{penscale} argument. The \eqn{\ell_2}{l2} structuring
+matrix \eqn{S}{S} is provided via the \code{struct}
+argument, a positive semidefinite matrix (possibly of class
+\code{Matrix}).
 }
 \examples{
 ## Simulating multivariate Gaussian with blockwise correlation
@@ -168,31 +165,16 @@ n <- 50
 x <- as.matrix(matrix(rnorm(95*n),n,95) \%*\% chol(Sigma))
 y <- 10 + x \%*\% beta + rnorm(n,0,10)
 
-## Structured Elastic.net
-p <- ncol(x)
-C <- bandSparse(p,k=0:1,diagonals=list(rep(1,p),rep(-1,p-1)))
-
-## This gives a great advantage to the elastic-net
-## for support recovery
-beta.lasso <- slot(crossval(x,y,lambda2=0 , mc.cores=2) , "beta.min")
-beta.enet  <- slot(crossval(x,y,lambda2=10, mc.cores=2), "beta.min")
-beta.struc <- slot(crossval(x,y,lambda2=10, mc.cores=2, struct=t(C) \%*\% C), "beta.min")
-
-cat("\\nFalse positives for the Lasso:", sum(sign(beta) != sign(beta.lasso)))
-cat("\\nFalse positives for the Elastic-net:", sum(sign(beta) != sign(beta.enet)))
-cat("\\nDONE.\\n")
-
 labels <- rep("irrelevant", length(beta))
 labels[beta != 0] <- "relevant"
-## Comparing the solution path pf the LASSO, the Elastic-net and the
-## Structured Elastic-net
+## Comparing the solution path of the LASSO and the Elastic-net
 plot(elastic.net(x,y,lambda2=0), label=labels) ## a mess
 plot(elastic.net(x,y,lambda2=10), label=labels) ## a lot better
-plot(elastic.net(x,y,lambda2=10,struct=solve(Sigma)), label=labels) ## even better
 }
 \seealso{
-  See also \code{\linkS4class{quadrupen}},
-  \code{\link{plot.quadrupen}} and \code{\link{crossval}}.
+See also \code{\linkS4class{quadrupen}},
+\code{\link{plot,quadrupen-method}} and
+\code{\link{crossval}}.
 }
 \keyword{models,}
 \keyword{regression}

@@ -21,7 +21,7 @@
 ##'
 ##' @keywords class
 ##'
-##' @seealso See also \code{\link{plot.stability.path}}, and
+##' @seealso See also \code{\link{plot,stability.path-method}}, and
 ##' \code{\link{stability}}.
 ##'
 ##' @name stability.path-class
@@ -67,8 +67,8 @@ setMethod("show", "stability.path", definition =
 ##' Produce a plot of the stability path obtained by stability
 ##' selection.
 ##'
-##' @usage plot.stability.path(x, y, xvar = "lambda", annot=TRUE,
-##'          main = paste("Stability path of an ", slot(x, "penalty")," regularizer", sep=""),
+##' @usage \\S4method{plot}{stability.path}(x, y, xvar = "lambda", annot=TRUE,
+##'          main = paste("Stability path for ", slot(x, "penalty")," regularizer", sep=""),
 ##'          log.scale = TRUE,  labels = rep("unknown status",p), plot = TRUE,
 ##'          sel.mode = c("rank","PFER"), cutoff=0.75, PFER=2, nvar=floor(n/log(p)), ...)
 ##' @param x output of a \code{stability} run (must be of class
@@ -106,12 +106,14 @@ setMethod("show", "stability.path", definition =
 ##' @return a list with a \pkg{ggplot2} object which can be plotted
 ##' via the \code{print} method, and a vector of selected variables
 ##' corresponding to method of choice (\code{'rank'} or
-##' \code{'PFER'}).
+##' \code{'PFER'})
+##' 
 ##' @name plot,stability.path-method
 ##' @aliases plot,stability.path-method
 ##' @aliases plot.stability.path
 ##' @docType methods
 ##' @rdname plot.stability.path
+##'
 ##'
 ##' @examples \dontrun{
 ##' ## Simulating multivariate Gaussian with blockwise correlation
@@ -143,7 +145,7 @@ setMethod("show", "stability.path", definition =
 ##' @export
 setMethod("plot", "stability.path", definition =
    function(x, y, xvar = "lambda", annot=TRUE,
-            main = paste("Stability path for the ", slot(x, "penalty")," regularizer", sep=""),
+            main = paste("Stability path for ", slot(x, "penalty")," regularizer", sep=""),
             log.scale = TRUE,  labels = rep("unknown status",p), plot = TRUE,
             sel.mode = c("rank","PFER"), cutoff=0.75, PFER=2, nvar=floor(n/log(p)), ...) {
 

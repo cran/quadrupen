@@ -1,8 +1,13 @@
 \docType{methods}
 \name{plot,stability.path-method}
-\alias{plot.stability.path}
 \alias{plot,stability.path-method}
 \title{Plot method for \code{stability.path}.}
+\usage{
+\\S4method{plot}{stability.path}(x, y, xvar = "lambda", annot=TRUE,
+         main = paste("Stability path for ", slot(x, "penalty")," regularizer", sep=""),
+         log.scale = TRUE,  labels = rep("unknown status",p), plot = TRUE,
+         sel.mode = c("rank","PFER"), cutoff=0.75, PFER=2, nvar=floor(n/log(p)), ...)
+}
 \arguments{
   \item{x}{output of a \code{stability} run (must be of
   class \code{stability.path}).}
@@ -57,14 +62,14 @@
   \item{...}{used for S4 compatibility.}
 }
 \value{
-  a list with a \pkg{ggplot2} object which can be plotted
-  via the \code{print} method, and a vector of selected
-  variables corresponding to method of choice
-  (\code{'rank'} or \code{'PFER'}).
+a list with a \pkg{ggplot2} object which can be plotted via
+the \code{print} method, and a vector of selected variables
+corresponding to method of choice (\code{'rank'} or
+\code{'PFER'})
 }
 \description{
-  Produce a plot of the stability path obtained by
-  stability selection.
+Produce a plot of the stability path obtained by stability
+selection.
 }
 \examples{
 \dontrun{

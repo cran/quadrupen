@@ -4,11 +4,10 @@
 \alias{quadrupen-package}
 \title{Sparsity by Worst-Case Quadratic Penalties}
 \description{
-  This package is designed to fit accurately several
-  popular penalized linear regression models using the
-  algorithm proposed in Grandvalet, Chiquet and Ambroise
-  (submitted) by solving quadratic problems with increasing
-  size.
+This package is designed to fit accurately several popular
+penalized linear regression models using the algorithm
+proposed in Grandvalet, Chiquet and Ambroise (submitted) by
+solving quadratic problems with increasing size.
 }
 \section{Features}{
   At the moment, two \code{R} fitting functions are
@@ -144,26 +143,26 @@
   \pkg{RcppArmadillo} package.
 }
 \author{
-  Julien Chiquet \email{julien.chiquet@genopole.cnrs.com}
+Julien Chiquet \email{julien.chiquet@genopole.cnrs.com}
 }
 \references{
-  Yves Grandvalet, Julien Chiquet and Christophe Ambroise,
-  \href{http://arxiv.org/abs/1210.2077}{Sparsity by
-  Worst-case Quadratic Penalties}, arXiv preprint, 2012.
+Yves Grandvalet, Julien Chiquet and Christophe Ambroise,
+\href{http://arxiv.org/abs/1210.2077}{Sparsity by
+Worst-case Quadratic Penalties}, arXiv preprint, 2012.
 
-  \itemize{%
+\itemize{%
 
-  \item Nicolas Meinshausen and Peter Buhlmann. Stability
-  Selection, JRSS(B), 2010. \item Martin Slawski, Wolfgang
-  zu Castell, and Gerhard Tutz. Feature selection guided by
-  structural information, AOAS, 2010. \item Peng Zhao,
-  Guillerme Rocha and Bin Yu. The composite absolute
-  penalties family for grouped and hierarchical variable
-  selection, The Annals of Statistics, 2009. \item Hui Zou.
-  The Adaptive Lasso and Its Oracle Properties, JASA, 2006.
-  \item Hui Zou and Trevor Hastie. Regularization and
-  variable selection via the elastic net, JRSS(B), 2006.
-  \item Robert Tibshirani. Regression Shrinkage and
-  Selection via the Lasso, JRSS(B), 1996. }
+\item Nicolas Meinshausen and Peter Buhlmann. Stability
+Selection, JRSS(B), 2010. \item Martin Slawski, Wolfgang zu
+Castell, and Gerhard Tutz. Feature selection guided by
+structural information, AOAS, 2010. \item Peng Zhao,
+Guillerme Rocha and Bin Yu. The composite absolute
+penalties family for grouped and hierarchical variable
+selection, The Annals of Statistics, 2009. \item Hui Zou.
+The Adaptive Lasso and Its Oracle Properties, JASA, 2006.
+\item Hui Zou and Trevor Hastie. Regularization and
+variable selection via the elastic net, JRSS(B), 2006.
+\item Robert Tibshirani. Regression Shrinkage and Selection
+via the Lasso, JRSS(B), 1996. }
 }
 
