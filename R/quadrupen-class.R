@@ -259,8 +259,8 @@ setMethod("plot", "quadrupen", definition =
      }
      colnames(data.coef) <- c("xvar","var","coef", "variables")
 
-     d <- ggplot(data.coef,aes(x=xvar,y=coefficients, colour=variables, group=var)) +
-       geom_line(aes(x=xvar,y=coef)) +
+     d <- ggplot(data.coef,aes_(x=~xvar,y=~coefficients, colour=~variables, group=~var)) +
+       geom_line(aes_(x=~xvar,y=~coef)) +
          labs(x=ifelse(xvar=="fraction",expression(paste("|",beta[lambda[1]],"|",{}[1]/max[lambda[1]],"|",beta[lambda[1]],"|",{}[1],sep="")),
                 ifelse(log.scale,expression(log[10](lambda[1])),expression(lambda[1]))),
               y=ifelse(standardize, "standardized coefficients","coefficients")) + ggtitle(main) +

@@ -125,21 +125,24 @@ setMethod("plot", "cvpen", definition =
 
     K <- length(x@folds)
     n <- length(unlist(x@folds))
+    cv.error <- as.data.frame(x@cv.error)
     if (length(x@lambda2) > 1) {
-      d <- ggplot(data=x@cv.error, aes(x=lambda1, y=lambda2, z=mean))
-      d <- d + geom_tile(aes(fill=mean)) + stat_contour(size=0.2, binwidth=diff(range(x@cv.error$mean))/10) + ggtitle(main)
+      d <- ggplot(data=cv.error, aes_(x=~lambda1, y=~lambda2, z=~mean))
+      d <- d + geom_tile(aes(fill=mean)) + stat_contour(size=0.2, binwidth=diff(range(cv.error$mean))/10) + ggtitle(main)
       d <- d + scale_x_continuous(trans=log10_trans()) + xlab(expression(log[10](lambda[1])))
       d <- d + scale_y_continuous(trans=log10_trans()) + ylab(expression(log[10](lambda[2])))
       d <- d + annotation_logticks()
-      in.1se <- which(x@cv.error$mean - x@cv.error$serr <= min(x@cv.error$mean))
-      d <- d + stat_contour(alpha=0.5, colour="#CCCCCC", size=0.65, breaks=quantile(x@cv.error$mean[in.1se], probs=seq(0,1,len=6)))
+      in.1se <- which(cv.error$mean - cv.error$serr <= min(cv.error$mean))
+      d <- d + stat_contour(alpha=0.5, colour="#CCCCCC", size=0.65, breaks=quantile(cv.error$mean[in.1se], probs=seq(0,1,len=6)))
     } else {
       ## SIMPLE CROSS-VALIDATION GRAPH
       if (log.scale) {
-        x@cv.error$lambda1 <- log10(x@cv.error$lambda1)
+        cv.error$lambda1 <- log10(cv.error$lambda1)
       }
-      d <- ggplot(x@cv.error, aes(x=lambda1,y=mean)) + ylab("Mean square error") + geom_point(alpha=0.3)
-      d <- d + geom_smooth(aes(ymin=mean-serr, ymax=mean+serr), data=x@cv.error, alpha=0.2, stat="identity")
+      cv.error$ymin <- cv.error$mean-cv.error$serr
+      cv.error$ymax <- cv.error$mean+cv.error$serr
+      d <- ggplot(cv.error, aes_(x=~lambda1,y=~mean)) + ylab("Mean square error") + geom_point(alpha=0.3)
+      d <- d + geom_smooth(aes_(ymin=~ymin, ymax=~ymax), data=cv.error, alpha=0.2, stat="identity")
       if (reverse==TRUE) {
         d <- d + scale_x_reverse()
       }
@@ -157,7 +160,7 @@ setMethod("plot", "cvpen", definition =
                              lambda.choice=factor(c("min. MSE","1-se rule")))
       }
       d <- d + ggtitle(main) +
-        geom_vline(data=lambda, aes(xintercept=xval,colour=lambda.choice), linetype="dashed",  alpha=0.5, show_guide=TRUE)
+        geom_vline(data=lambda, aes_(xintercept=~xval,colour=~lambda.choice), linetype="dashed",  alpha=0.5, show_guide=TRUE)
     }
     ## DO THE PLOT
     if (plot) {print(d)}

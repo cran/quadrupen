@@ -207,8 +207,8 @@ setMethod("plot", "stability.path", definition =
      colnames(data.coef) <- c("xvar","var","prob","selection","variables")
 
      ## Build the ggplot object
-     d <- ggplot(data.coef,aes(x=xvar,y=prob, linetype=variables, colour=selection, group=var)) +
-       geom_line(aes(x=xvar,y=prob)) +
+     d <- ggplot(data.coef,aes_(x=~xvar,y=~prob, linetype=~variables, colour=~selection, group=~var)) +
+       geom_line(aes_(x=~xvar,y=~prob)) +
          labs(x=switch(xvar,
                 "fraction" = expression(lambda[1]/max[lambda[1]]),
                 ifelse(log.scale,expression(log[10](lambda[1])),expression(lambda[1]))),

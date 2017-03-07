@@ -559,7 +559,7 @@ quadrupen <- function(beta0    ,
                  inherits(x, "sparseMatrix"),
                  ctrl$usechol,
                  ctrl$monitor,
-                 package = "quadrupen")
+                 PACKAGE = "quadrupen")
     coefficients <- sparseMatrix(i = out$iA+1,
                                  j = out$jA+1,
                                  x = c(out$nzeros),
@@ -589,7 +589,7 @@ quadrupen <- function(beta0    ,
                  ctrl$verbose,
                  inherits(x, "sparseMatrix"),
                  ctrl$bulletproof,
-                 package = "quadrupen")
+                 PACKAGE = "quadrupen")
     coefficients <- Matrix(out$coefficients)
     active.set   <- sparseMatrix(i = out$iB+1,
                                  j = out$jB+1,

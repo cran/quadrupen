@@ -1,5 +1,9 @@
 NEWS/Changelog
 
+0.2-5	(2017-03-06)
+    Minor:
+    +   change "package = " to "PACKAGE = "
+
 0.2-4	(2014-01-16)
     Minor:
     +   memory leak corrected (sp_mat declaration)
