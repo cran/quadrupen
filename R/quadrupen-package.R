@@ -110,7 +110,7 @@
 ##'
 ##' Most of the numerical work is done in C++, relying on the
 ##' \pkg{RcppArmadillo} package. We also provide a (double)
-##' cross-validation procedure and functions for stabilty selection,
+##' cross-validation procedure and functions for stability selection,
 ##' both using the multi-core capability of the computer, through the
 ##' \pkg{parallel} package. This feature is not available for Windows
 ##' user, though. Finally, note that the plot methods enjoy some

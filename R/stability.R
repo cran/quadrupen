@@ -98,6 +98,8 @@
 ##'}
 ##' @keywords models, regression
 ##'
+##' @importFrom stats runif
+##' @importFrom utils modifyList
 ##' @name stability
 ##' @aliases stability
 ##' @rdname stability

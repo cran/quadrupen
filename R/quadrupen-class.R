@@ -15,7 +15,7 @@
 ##' activate the constraints. For the \code{\link{elastic.net}}, it
 ##' corresponds to the nonzero variables; for the
 ##' \code{\link{bounded.reg}} function, it is the set of variables
-##' reaching the boudary along the path of solutions.}
+##' reaching the boundary along the path of solutions.}
 ##'
 ##' \item{\code{intercept}:}{logical; indicates if an intercept has
 ##'  been included to the model.}
@@ -180,6 +180,7 @@ setMethod("show", "quadrupen", definition =
 ##' \code{NULL}.
 ##' @param plot logical; indicates if the graph should be plotted on
 ##' call. Default is \code{TRUE}.
+##' @param ... Not used
 ##'
 ##' @return a \pkg{ggplot2} object which can be plotted via the
 ##' \code{print} method.

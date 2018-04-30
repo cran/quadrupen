@@ -84,7 +84,7 @@ SEXP bounded_reg(SEXP X        ,
 
   // STRUCTURATING MATRIX
   sp_mat S ;
-  if (STRUCT == R_NilValue | lambda2 == 0) {
+  if (STRUCT == R_NilValue || lambda2 == 0) {
     S = speye<sp_mat>(p,p);
   } else {
     S = as<sp_mat> (STRUCT) ;

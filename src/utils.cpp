@@ -67,7 +67,7 @@ void add_var_enet(uword &n, int &nbr_in, uword &var_in, vec &betaA, uvec &A, mat
   xtxA  = join_rows(xtxA, new_col) ;
   xAtxA = join_rows(xAtxA, trans(xtxA.row(var_in))) ;
 
-  if (fun == 0 & usechol == 1) {
+  if (fun == 0 && usechol == 1) {
     cholupdate(R, xAtxA) ;
   }
 
@@ -99,7 +99,7 @@ void add_var_enet(uword &n, int &nbr_in, uword &var_in, vec &betaA, uvec &A, sp_
   xtxA  = join_rows(xtxA, new_col) ;
   xAtxA = join_rows(xAtxA, trans(xtxA.row(var_in))) ;
 
-  if (fun == 0 & usechol == 1) {
+  if (fun == 0 && usechol == 1) {
     cholupdate(R, xAtxA) ;
   }
 
@@ -121,7 +121,7 @@ void remove_var_enet(int &nbr_in, uvec &are_in, vec &betaA, uvec &A, mat &xtxA, 
     xtxA.shed_col(null[j])  ;
     xAtxA.shed_col(null[j]) ;
     xAtxA.shed_row(null[j]) ;
-    if (fun == 0 & usechol == 1) {
+    if (fun == 0 && usechol == 1) {
       choldowndate(R, null[j]) ;
     }
     nbr_in--;
@@ -188,7 +188,7 @@ vec cg(mat A, vec b, vec x, double tol) {
   double alpha ;
   mat Ap ;
 
-  while (sqrt(rs_new) > tol & i < 1e3) {
+  while (sqrt(rs_new) > tol && i < 1e3) {
     Ap = A * p;
     alpha = rs_old/dot(p,Ap) ;
     x += alpha * p ;
@@ -219,7 +219,7 @@ vec pcg(mat A, mat P, vec b, vec x, double tol) {
   double alpha ;
   mat Ap ;
 
-  while (sqrt(rs_new) > tol & i < 1e3) {
+  while (sqrt(rs_new) > tol && i < 1e3) {
     Ap = A * p;
     alpha = rs_old/dot(p,Ap) ;
     x += alpha * p ;

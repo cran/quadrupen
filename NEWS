@@ -1,5 +1,9 @@
 NEWS/Changelog
 
+0.2-6	(2018-04-30)
+    Minor:
+    +   change & to && in C++ code to avoid warnings during checks
+
 0.2-5	(2017-03-06)
     Minor:
     +   change "package = " to "PACKAGE = "

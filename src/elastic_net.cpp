@@ -83,7 +83,7 @@ SEXP elastic_net(SEXP BETA0    ,
 
   // STRUCTURATING MATRIX
   sp_mat S ;
-  if (STRUCT == R_NilValue | lambda2 == 0) {
+  if (STRUCT == R_NilValue || lambda2 == 0) {
     S = speye<sp_mat>(p,p);
   } else {
     S = as<sp_mat> (STRUCT) ;
@@ -150,7 +150,7 @@ SEXP elastic_net(SEXP BETA0    ,
     grd += xtxA * betaA    ;
     nbr_in = A.n_elem;
     xAtxA = xtxA.rows(A)   ;
-    if (fun == 0 & usechol) {
+    if (fun == 0 && usechol) {
       R = chol(xAtxA) ;
     }
     if (fun == 1) {

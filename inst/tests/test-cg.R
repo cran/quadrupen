@@ -1,4 +1,4 @@
-context("Testing consistency and timings of conjugate gradient algorithm - VERY PRELIMINARY")
+testthat::context("Testing consistency and timings of conjugate gradient algorithm - VERY PRELIMINARY")
 
 test_that("dev_conjugate_gradient", {
 

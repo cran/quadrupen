@@ -47,7 +47,7 @@
 ##' \eqn{\lambda_1}{lambda1}.  This is done by means of \code{NA}
 ##' values, so as mean and standard error are consistently
 ##' evaluated. If, while cross-validating, the procedure experiences
-##' too much early stoppings, a warning is sent to the user, in which
+##' too many early stoppings, a warning is sent to the user, in which
 ##' case you should reconsider the grid of \code{lambda1} used for the
 ##' cross-validation.  If \code{bulletproof} is \code{TRUE} (the
 ##' default), there is nothing to worry about, except a possible slow
@@ -92,6 +92,7 @@
 ##' cat("\nFalse positives with the minimal LOO-CV choice: ", sum(sign(beta) != sign(beta.min.loo)))
 ##' }
 ##'
+##' @importFrom utils modifyList
 ##' @keywords models, regression
 ##' @name crossval
 ##' @aliases crossval

@@ -117,14 +117,13 @@ setClass("cvpen",
 ##' }
 ##'
 ##' @importFrom graphics plot
+##' @importFrom stats quantile
 ##' @exportMethod plot
 ##' @import ggplot2 scales grid
 ##' @export
 setMethod("plot", "cvpen", definition =
   function(x, y, log.scale=TRUE, reverse=FALSE, plot=TRUE, main = "Cross-validation error", ...) {
 
-    K <- length(x@folds)
-    n <- length(unlist(x@folds))
     cv.error <- as.data.frame(x@cv.error)
     if (length(x@lambda2) > 1) {
       d <- ggplot(data=cv.error, aes_(x=~lambda1, y=~lambda2, z=~mean))
@@ -142,7 +141,7 @@ setMethod("plot", "cvpen", definition =
       cv.error$ymin <- cv.error$mean-cv.error$serr
       cv.error$ymax <- cv.error$mean+cv.error$serr
       d <- ggplot(cv.error, aes_(x=~lambda1,y=~mean)) + ylab("Mean square error") + geom_point(alpha=0.3)
-      d <- d + geom_smooth(aes_(ymin=~ymin, ymax=~ymax), data=cv.error, alpha=0.2, stat="identity")
+      d <- d + geom_line() + geom_ribbon(aes_(ymin=~ymin, ymax=~ymax), data=cv.error, alpha=0.2, stat="identity")
       if (reverse==TRUE) {
         d <- d + scale_x_reverse()
       }
@@ -160,7 +159,7 @@ setMethod("plot", "cvpen", definition =
                              lambda.choice=factor(c("min. MSE","1-se rule")))
       }
       d <- d + ggtitle(main) +
-        geom_vline(data=lambda, aes_(xintercept=~xval,colour=~lambda.choice), linetype="dashed",  alpha=0.5, show_guide=TRUE)
+        geom_vline(data=lambda, aes_(xintercept=~xval,colour=~lambda.choice), linetype="dashed",  alpha=0.5, show.legend = TRUE)
     }
     ## DO THE PLOT
     if (plot) {print(d)}
