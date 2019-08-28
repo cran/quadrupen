@@ -93,7 +93,7 @@
 ##' }
 ##'
 ##' @importFrom utils modifyList
-##' @keywords models, regression
+##' @keywords models regression
 ##' @name crossval
 ##' @aliases crossval
 ##' @rdname crossval

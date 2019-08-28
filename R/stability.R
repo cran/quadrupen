@@ -96,7 +96,7 @@
 ##'      sum(labels[stabpath$selected] != "relevant"))
 ##' cat("\nDONE.\n")
 ##'}
-##' @keywords models, regression
+##' @keywords models regression
 ##'
 ##' @importFrom stats runif
 ##' @importFrom utils modifyList

@@ -32,7 +32,7 @@ SEXP elastic_net(SEXP BETA0    ,
 
   // disable messages being printed to the err2 stream
   std::ostream nullstream(0);
-  set_stream_err2(nullstream);
+  set_cerr_stream(nullstream);
 
   // Reading input variables
   bool intercept  = as<bool>   (INTERCEPT) ; // boolean for intercept mode

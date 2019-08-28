@@ -132,7 +132,7 @@
 ##' \code{\link{plot,quadrupen-method}} and \code{\link{crossval}}.
 ##' @name elastic.net
 ##' @rdname elastic.net
-##' @keywords models, regression
+##' @keywords models regression
 ##'
 ##' @examples
 ##' ## Simulating multivariate Gaussian with blockwise correlation
@@ -391,7 +391,7 @@ elastic.net <- function(x,
 ##' \code{\link{plot,quadrupen-method}} and \code{\link{crossval}}.
 ##' @name bounded.reg
 ##' @rdname bounded.reg
-##' @keywords models, regression
+##' @keywords models regression
 ##'
 ##' @examples
 ##' ## Simulating multivariate Gaussian with blockwise correlation

@@ -4,12 +4,12 @@
 \alias{elastic.net}
 \title{Fit a linear model with elastic-net regularization}
 \usage{
-elastic.net(x, y, lambda1 = NULL, lambda2 = 0.01, penscale = rep(1, p),
-  struct = NULL, intercept = TRUE, normalize = TRUE, naive = FALSE,
-  nlambda1 = ifelse(is.null(lambda1), 100, length(lambda1)),
-  min.ratio = ifelse(n <= p, 0.01, 1e-04), max.feat = ifelse(lambda2 < 0.01,
-  min(n, p), min(4 * n, p)), beta0 = NULL, control = list(),
-  checkargs = TRUE)
+elastic.net(x, y, lambda1 = NULL, lambda2 = 0.01, penscale = rep(1,
+  p), struct = NULL, intercept = TRUE, normalize = TRUE,
+  naive = FALSE, nlambda1 = ifelse(is.null(lambda1), 100,
+  length(lambda1)), min.ratio = ifelse(n <= p, 0.01, 1e-04),
+  max.feat = ifelse(lambda2 < 0.01, min(n, p), min(4 * n, p)),
+  beta0 = NULL, control = list(), checkargs = TRUE)
 }
 \arguments{
 \item{x}{matrix of features, possibly sparsely encoded
@@ -167,5 +167,5 @@ plot(elastic.net(x,y,lambda2=10), label=labels) ## a lot better
 See also \code{\linkS4class{quadrupen}},
 \code{\link{plot,quadrupen-method}} and \code{\link{crossval}}.
 }
-\keyword{models,}
+\keyword{models}
 \keyword{regression}

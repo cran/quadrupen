@@ -4,11 +4,12 @@
 \alias{bounded.reg}
 \title{Fit a linear model with infinity-norm plus ridge-like regularization}
 \usage{
-bounded.reg(x, y, lambda1 = NULL, lambda2 = 0.01, penscale = rep(1, p),
-  struct = NULL, intercept = TRUE, normalize = TRUE, naive = FALSE,
-  nlambda1 = ifelse(is.null(lambda1), 100, length(lambda1)),
-  min.ratio = ifelse(n <= p, 0.01, 0.001), max.feat = ifelse(lambda2 < 0.01,
-  min(n, p), min(4 * n, p)), control = list(), checkargs = TRUE)
+bounded.reg(x, y, lambda1 = NULL, lambda2 = 0.01, penscale = rep(1,
+  p), struct = NULL, intercept = TRUE, normalize = TRUE,
+  naive = FALSE, nlambda1 = ifelse(is.null(lambda1), 100,
+  length(lambda1)), min.ratio = ifelse(n <= p, 0.01, 0.001),
+  max.feat = ifelse(lambda2 < 0.01, min(n, p), min(4 * n, p)),
+  control = list(), checkargs = TRUE)
 }
 \arguments{
 \item{x}{matrix of features, possibly sparsely encoded
@@ -184,5 +185,5 @@ plot(bounded.reg(x,y,lambda2=10), label=labels) ## good guys are at the boundari
 See also \code{\linkS4class{quadrupen}},
 \code{\link{plot,quadrupen-method}} and \code{\link{crossval}}.
 }
-\keyword{models,}
+\keyword{models}
 \keyword{regression}

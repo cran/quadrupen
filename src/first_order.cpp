@@ -68,7 +68,7 @@ int fista_lasso(vec  &x0   ,
     R_CheckUserInterrupt();
   }
 
-  null = sort(find(abs(xk) + (abs(df) - pen) < ZERO),1) ;
+  null = sort(find(abs(xk) + (abs(df) - pen) < ZERO), "descend") ;
 
   return(iter);
 }
@@ -144,13 +144,13 @@ vec proximal_inf(vec v,
   if ( as_scalar(sum(abs(v) / lambda)) >= 1) {   
     
     // Reordonnons les valeurs absolues
-    u = sort(abs(v),1);
+    u = sort(abs(v), "descend");
     
     // valeurs des coordonnées projetees si non nulles (problème dual)
     proj = (cumsum(u) - lambda)/linspace<vec>(1,p,p);
     
     // selection des coordonnees non nulles (problème dual)
-    uvec maxs = sort(find(u-proj>ZERO),1) ;
+    uvec maxs = sort(find(u-proj>ZERO), "descend") ;
     double thresh = proj[maxs[0]];
     
     // solution du programme primal
@@ -203,6 +203,6 @@ int pathwise_enet(vec&  x0,
     R_CheckUserInterrupt();    
   }
 
-  null = sort(find(abs(xk) + (abs(-xty + xtxw) - pen) < ZERO),1) ;
+  null = sort(find(abs(xk) + (abs(-xty + xtxw) - pen) < ZERO), "descend") ;
   return(iter);
 }

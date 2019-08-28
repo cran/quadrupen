@@ -107,5 +107,5 @@ cat("\\nFalse positives with the minimal LOO-CV choice: ", sum(sign(beta) != sig
 \code{\linkS4class{quadrupen}}, \code{\link{plot,cvpen-method}}
 and \code{\linkS4class{cvpen}}.
 }
-\keyword{models,}
+\keyword{models}
 \keyword{regression}

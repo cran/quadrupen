@@ -4,10 +4,11 @@
 \alias{stability}
 \title{Stability selection for a quadrupen fit.}
 \usage{
-stability(x, y, penalty = c("elastic.net", "bounded.reg"), subsamples = 100,
-  sample.size = floor(n/2), randomize = TRUE, weakness = 0.5,
-  verbose = TRUE, folds = replicate(subsamples, sample(1:nrow(x),
-  sample.size), simplify = FALSE), mc.cores = detectCores(), ...)
+stability(x, y, penalty = c("elastic.net", "bounded.reg"),
+  subsamples = 100, sample.size = floor(n/2), randomize = TRUE,
+  weakness = 0.5, verbose = TRUE, folds = replicate(subsamples,
+  sample(1:nrow(x), sample.size), simplify = FALSE),
+  mc.cores = detectCores(), ...)
 }
 \arguments{
 \item{x}{matrix of features, possibly sparsely encoded
@@ -113,5 +114,5 @@ Selection, JRSS(B).
 \code{\linkS4class{stability.path}} and
 \code{\link{plot,stability.path-method}}.
 }
-\keyword{models,}
+\keyword{models}
 \keyword{regression}
