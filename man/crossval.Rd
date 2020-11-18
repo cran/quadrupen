@@ -4,9 +4,17 @@
 \alias{crossval}
 \title{Cross-validation function for quadrupen fitting methods.}
 \usage{
-crossval(x, y, penalty = c("elastic.net", "bounded.reg"), K = 10,
+crossval(
+  x,
+  y,
+  penalty = c("elastic.net", "bounded.reg"),
+  K = 10,
   folds = split(sample(1:nrow(x)), rep(1:K, length = nrow(x))),
-  lambda2 = 0.01, verbose = TRUE, mc.cores = detectCores(), ...)
+  lambda2 = 0.01,
+  verbose = TRUE,
+  mc.cores = 2,
+  ...
+)
 }
 \arguments{
 \item{x}{matrix of features, possibly sparsely encoded
@@ -35,8 +43,7 @@ same folds for each \code{lambda2}).}
 \item{verbose}{logical; indicates if the progression (the current
 lambda2) should be displayed. Default is \code{TRUE}.}
 
-\item{mc.cores}{the number of cores to use. The default uses all
-the cores available.}
+\item{mc.cores}{the number of cores to use. The default uses 2 cores.}
 
 \item{...}{additional parameters to overwrite the defaults of the
 fitting procedure identified by the \code{'penalty'} argument. See
@@ -69,7 +76,6 @@ default), there is nothing to worry about, except a possible slow
 down when any switching to the proximal algorithm is required.
 }
 \examples{
-\dontrun{
 ## Simulating multivariate Gaussian with blockwise correlation
 ## and piecewise constant vector of parameters
 beta <- rep(c(0,1,0,-1,0), c(25,10,25,10,25))
@@ -84,13 +90,17 @@ y <- 10 + x \%*\% beta + rnorm(n,0,10)
 
 ## Use fewer lambda1 values by overwritting the default parameters
 ## and cross-validate over the sequences lambda1 and lambda2
+\donttest{
 cv.double <- crossval(x,y, lambda2=10^seq(2,-2,len=50), nlambda1=50)
+}
 ## Rerun simple cross-validation with the appropriate lambda2
-cv.10K <- crossval(x,y, lambda2=slot(cv.double, "lambda2.min"))
+cv.10K <- crossval(x,y, lambda2=0.2)
 ## Try leave one out also
-cv.loo <- crossval(x,y, K=n, lambda2=slot(cv.double, "lambda2.min"))
+cv.loo <- crossval(x,y, K=n, lambda2=0.2)
 
+\donttest{
 plot(cv.double)
+}
 plot(cv.10K)
 plot(cv.loo)
 
@@ -98,9 +108,8 @@ plot(cv.loo)
 beta.min.10K <- slot(cv.10K, "beta.min")
 beta.min.loo <- slot(cv.loo, "beta.min")
 
-cat("\\nFalse positives with the minimal 10-CV choice: ", sum(sign(beta) != sign(beta.min.10K)))
-cat("\\nFalse positives with the minimal LOO-CV choice: ", sum(sign(beta) != sign(beta.min.loo)))
-}
+cat("\nFalse positives with the minimal 10-CV choice: ", sum(sign(beta) != sign(beta.min.10K)))
+cat("\nFalse positives with the minimal LOO-CV choice: ", sum(sign(beta) != sign(beta.min.loo)))
 
 }
 \seealso{

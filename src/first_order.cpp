@@ -14,7 +14,7 @@ int fista_lasso(vec  &x0   ,
 
   colvec xk = x0  ; // output vector
   colvec  s = x0  ;
-  int iter = 0, j = 0      ; // current iterate
+  int iter = 0    ; // current iterate
   double delta = 2*eps  ; // change in beta
   int max_iter  = 10000 ; // max. number of iteration
   double L  = L0        ; // Lipschitz's constant
@@ -35,7 +35,7 @@ int fista_lasso(vec  &x0   ,
     while(!found) {
       // apply proximal operator of the Lasso
       xk = s - df/L ;
-      for (j=0; j<x0.n_elem; j++) {
+      for (uword j=0; j<x0.n_elem; j++) {
 	xk(j) = fmax(0,1-(pen/L)/fabs(xk(j))) * xk(j);
       }
 
@@ -178,7 +178,7 @@ int pathwise_enet(vec&  x0,
 		  double eps    ) {
   
   colvec xk = x0 ; // output vector
-  int j, iter  = 0     ; // current iterate
+  int iter  = 0  ; // current iterate
   int max_iter = 10000 ; // max. number of iteration
   double delta = 2*eps ; // change in beta
   double u, d          ; // temporary scalar
@@ -186,7 +186,7 @@ int pathwise_enet(vec&  x0,
   while ((delta > eps/x0.n_elem ) && (iter < max_iter)) {
 
     delta = 0;
-    for (j=0; j<x0.n_elem; j++) {
+    for (uword j=0; j<x0.n_elem; j++) {
       // Soft thresholding operator
       u = x0(j) * (1+gam) + xty(j) - xtxw(j) ;
       xk(j)  = fmax(1-pen/fabs(u),0) * u/(1+gam) ;

@@ -103,7 +103,7 @@ SEXP bounded_reg(SEXP X        ,
   // Initializing "first level" variables (outside of the lambda1 loop)
   colvec beta     = zeros<vec>(p)          ; // vector of current parameters
   uvec   B          (p)                    ; // guys reaching the boundary
-  for (int i=0;i<p;i++){B(i) = i;}
+  for (size_t i=0;i<p;i++){B(i) = i;}
   mat    coef                              ; // matrice of solution path
   vec    grd                               ; // smooth part of the gradient
   vec    mu        = zeros<vec>(n_lambda)  ; // the intercept term
@@ -125,7 +125,7 @@ SEXP bounded_reg(SEXP X        ,
   //
   // START THE LOOP OVER LAMBDA
   timer.tic();
-  for (int m=0; m<n_lambda; m++) {
+  for (size_t m=0; m<n_lambda; m++) {
     if (verbose == 2) {Rprintf("\n lambda1 = %f",lambda1(m)) ;}
 
     // _____________________________________________________________

@@ -23,16 +23,18 @@ test_that("weighted_ quad2theo", {
   w <- w/sum(w)*p ## to fit glmnet rescaling
   lasso.quad <- elastic.net(x, y,intercept=FALSE, penscale = w, lambda2=0)
   theo.path  <- t(sapply(lasso.quad@lambda1, function(lambda) y*pmax(0,1-lambda*w/abs(y))))
-  expect_that(as.matrix(lasso.quad@coefficients), is_equivalent_to(theo.path))
+  expect_equivalent(as.matrix(lasso.quad@coefficients), theo.path, tolerance = 1e-6)
 
   ## glmnet with intercept fit with quadrupen and the theory
   w <- 1/runif(p,0.5,1)
   w <- w/sum(w)*p ## to fit glmnet rescaling
   lasso.glmn <- glmnet(x,y, penalty.factor=w,lambda.min.ratio=1e-2, thresh=1e-20)
   lasso.quad <- elastic.net(x,y, lambda1=lasso.glmn$lambda*sqrt(n), penscale = w, lambda2=0)
-  expect_that(as.matrix(t(lasso.glmn$beta)), is_equivalent_to(as.matrix(lasso.quad@coefficients)))
+  
+  expect_equivalent(as.matrix(t(lasso.glmn$beta)), as.matrix(lasso.quad@coefficients), tolerance = 1e-6)
+  
   ## Check the intercept term also
-  expect_that(lasso.glmn$a0, is_equivalent_to(lasso.quad@mu))
+  expect_equivalent(lasso.glmn$a0, lasso.quad@mu, tolerance = 1e-6)
 
 })
 

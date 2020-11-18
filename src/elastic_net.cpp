@@ -142,7 +142,7 @@ SEXP elastic_net(SEXP BETA0    ,
       xtxA = mat(xt * x.cols(A)) ;
     }
     if (lambda2 > 0) {
-      for (int i=0; i<A.n_elem;i++) {
+      for (uword i=0; i<A.n_elem;i++) {
 	xtxA.col(i) = xtxA.col(i) + S.col(A(i));
 	are_in(A(i)) = 1;
       }
@@ -168,7 +168,7 @@ SEXP elastic_net(SEXP BETA0    ,
   //
   // START THE LOOP OVER LAMBDA
   timer.tic();
-  for (int m=0; m<n_lambda; m++) {
+  for (uword m=0; m<n_lambda; m++) {
     if (verbose == 2) {Rprintf("\n lambda1 = %f",lambda1(m)) ;}
     // _____________________________________________________________
     //
@@ -241,7 +241,7 @@ SEXP elastic_net(SEXP BETA0    ,
       // removing variables zeroed during optimization
       if (!null.is_empty()) {
 	if (verbose == 2) {
-	  for (int j=0; j<null.n_elem; j++) {Rprintf("removing variable %i\n",null[j]);}
+	  for (uword j=0; j<null.n_elem; j++) {Rprintf("removing variable %i\n",null[j]);}
 	}
 	remove_var_enet(nbr_in,are_in,betaA,A,xtxA,xAtxA,xtxw,R,null,usechol,fun) ;
       }
@@ -287,7 +287,7 @@ SEXP elastic_net(SEXP BETA0    ,
     if (it_active[m] >= max_iter) {
       converge[m] = 1;
     }
-    if (nbr_in > max_feat) {
+    if (static_cast<uword>(nbr_in) > max_feat) {
       converge[m] = 2 ;
     }
     if (!success_optim) {

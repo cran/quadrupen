@@ -3,6 +3,7 @@
 \docType{methods}
 \name{plot,quadrupen-method}
 \alias{plot,quadrupen-method}
+\alias{plot.quadrupen}
 \title{Plot method for a quadrupen object}
 \usage{
 \\S4method{plot}{quadrupen}(x, y, xvar = "lambda",
@@ -53,7 +54,6 @@ a \pkg{ggplot2} object which can be plotted via the
 Produce a plot of the solution path of a \code{quadrupen} fit.
 }
 \examples{
-\dontrun{
 ## Simulating multivariate Gaussian with blockwise correlation
 ## and piecewise constant vector of parameters
 beta <- rep(c(0,1,0,-1,0), c(25,10,25,10,25))
@@ -69,12 +69,11 @@ y <- 10 + x \%*\% beta + rnorm(n,0,10)
 ## Plot the Lasso path
 plot(elastic.net(x,y, lambda2=0), main="Lasso solution path")
 ## Plot the Elastic-net path
-plot(enet, main = "Elastic-net solution path")
+plot(elastic.net(x,y, lambda2=10), xvar = "lambda")
 ## Plot the Elastic-net path (fraction on X-axis, unstandardized coefficient)
 plot(elastic.net(x,y, lambda2=10), standardize=FALSE, xvar="fraction")
 ## Plot the Bounded regression path (fraction on X-axis)
 plot(bounded.reg(x,y, lambda2=10), xvar="fraction")
-}
 
 }
 \seealso{

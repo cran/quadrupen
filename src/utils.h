@@ -66,7 +66,7 @@ void standardize(any_mat &x, vec &y, bool &intercept, bool &normalize, vec &pens
 
   if (normalize == 1) {
     normx = sqrt(trans(sum(square(x),0)) - n * square(xbar));
-    for (int i=0; i<p; i++) {
+    for (uword i=0; i<p; i++) {
       x.col(i) /= normx(i);
     }
     xbar /= normx ;
@@ -76,7 +76,7 @@ void standardize(any_mat &x, vec &y, bool &intercept, bool &normalize, vec &pens
   normy = sqrt(sum(square(y))) ;
 
   if (any(penscale != 1)) {
-    for (int i=0; i<n; i++) {
+    for (uword i=0; i<n; i++) {
        x.row(i) /= penscale ;
     }
     xbar /= penscale;
@@ -84,7 +84,7 @@ void standardize(any_mat &x, vec &y, bool &intercept, bool &normalize, vec &pens
 
   if (intercept == 1) {
     xty = trans(trans(y-ybar) * x) ;
-    for (int i=0;i<p;i++) {
+    for (uword i=0;i<p;i++) {
        xty(i) -=  sum(y-ybar) * xbar(i);
     }
   } else {

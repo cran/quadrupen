@@ -1,23 +1,26 @@
-NEWS/Changelog
+# quadrupen 0.2-8	(2020-11-04)
+    Minor:
+    +   Avoid warning in C++ to pass CRAN checks, thanks to a PR of Dirk Eddelbuettel <edd@debian.org>
+    +   Minors changes in examples, default mc.cores to 2
 
-0.2-7	(2019-08-27)
+# quadrupen 0.2-7	(2019-08-27)
     Minor:
     +   change sort(, 1) to sort(, "descend") in C++ code to avoid warnings during checks
 
-0.2-6	(2018-04-30)
+# quadrupen 0.2-6	(2018-04-30)
     Minor:
     +   change & to && in C++ code to avoid warnings during checks
 
-0.2-5	(2017-03-06)
+# quadrupen 0.2-5	(2017-03-06)
     Minor:
     +   change "package = " to "PACKAGE = "
 
-0.2-4	(2014-01-16)
+# quadrupen 0.2-4	(2014-01-16)
     Minor:
     +   memory leak corrected (sp_mat declaration)
     +   linking to Rcpp/RcppArmadillo headers (requires R 3.0-2)
 
-0.2-3	(2013-08-26)
+# quadrupen 0.2-3	(2013-08-26)
     +   added back the 'normalize' parameter
     +   standardization is performed within the C++ code
     +   use of sparse conversion from Matrix to Armadillo
@@ -26,13 +29,13 @@ NEWS/Changelog
     +   correction in the documentation
     +   added r.squared to the quadrupen class
 
-0.2-2	(2013-04-08)
+# quadrupen 0.2-2	(2013-04-08)
     +   minor fix to comply with recent ggplot2 updates.
 
-0.2-1	(2013-02-27)
+# quadrupen 0.2-1	(2013-02-27)
     +   minor fix to pass CRAN check on Windows operating systems.
 
-0.2-0	(2013-02-26)
+# quadrupen 0.2-0	(2013-02-26)
     Major:
     +	added bounded regression (regression penalized by infinity norm + structered l2 norm)
     +   added corresponding functionalies for cross-validation and stability path
@@ -46,5 +49,5 @@ NEWS/Changelog
     +   simplification of the C++ code, bugs corrected, probably new ones added :-'(
     +   added 'examples' and 'tests' directories
 
-0.1-0	(2012-10-09)
+# quadrupen 0.1-0	(2012-10-09)
     +	first build: structured elastic-net with (weighted) quadratic loss, cross-validation and stability selection methods.

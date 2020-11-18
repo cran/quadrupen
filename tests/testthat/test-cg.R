@@ -2,8 +2,6 @@ testthat::context("Testing consistency and timings of conjugate gradient algorit
 
 test_that("dev_conjugate_gradient", {
 
-  require(quadrupen)
-
   get.coef <- function(x,y) {
     lambda1 <- .25
 

@@ -137,7 +137,7 @@ of the great \pkg{RcppArmadillo} package.
 
 \references{
 Yves Grandvalet, Julien Chiquet and Christophe Ambroise,
-\href{http://arxiv.org/abs/1210.2077}{Sparsity by Worst-case Quadratic
+\href{https://arxiv.org/abs/1210.2077}{Sparsity by Worst-case Quadratic
 Penalties}, arXiv preprint, 2012.
 
 \itemize{%
@@ -159,5 +159,5 @@ via the Lasso, JRSS(B), 1996.
 }
 }
 \author{
-Julien Chiquet \email{julien.chiquet@genopole.cnrs.com}
+Julien Chiquet \email{julien.chiquet@inrae.fr}
 }
