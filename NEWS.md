@@ -1,3 +1,8 @@
+# quadrupen 0.2-9
+
+  - Adaptation due to new Matrix version 1.4-2
+  - fix for HTML5 in documentation
+
 # quadrupen 0.2-8	(2020-11-04)
     Minor:
     +   Avoid warning in C++ to pass CRAN checks, thanks to a PR of Dirk Eddelbuettel <edd@debian.org>

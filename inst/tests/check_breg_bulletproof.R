@@ -1,8 +1,6 @@
 ## BOUNDED REGRESSION
 ##
 ## CHECK HANDLING OF UNSTABILITY ALONG THE PATH
-rm(list=ls())
-library(quadrupen)
 
 ## Reproduce cases where the quadratic solver fails: high correlation
 ## for ALL the features (including irrelevant), n = p, too small

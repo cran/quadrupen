@@ -48,10 +48,10 @@ test_that("Consistency of quadrupen between sparse/non-sparse encoding of the pr
   cat(" took", out.enet.sp@monitoring$external.timer, "seconds to activate",
       rowSums(out.enet.sp@active.set)[length(out.enet.sp@lambda1)],"variables.")
 
-  ## remove timer for fair comparison!!!
-  out.enet.sp@monitoring[5:7] <- NULL
-  out.enet.ns@monitoring[5:7] <- NULL
-  expect_that(out.enet.sp, equals(out.enet.ns))
+  ## remove monitoring for fair comparison!!!
+  out.enet.sp@monitoring <- list()
+  out.enet.ns@monitoring <- list()
+  expect_equivalent(out.enet.sp, out.enet.ns)
 })
 
 

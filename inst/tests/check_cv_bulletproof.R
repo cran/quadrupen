@@ -3,7 +3,6 @@
 ## CHECK CORRECT BEHAVIOR WHEN THE UNDERLYING BOUNDED.REG FUNCTION
 ## EXPERIENCES UNSTABILITY
 
-library(quadrupen)
 set.seed(111)
 ## mutivariate Gaussian data
 mu <- 3

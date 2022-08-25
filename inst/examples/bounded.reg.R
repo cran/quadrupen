@@ -1,5 +1,3 @@
-rm(list=ls())
-library(quadrupen)
 ## Simulating multivariate Gaussian with blockwise correlation
 ## and piecewise constant vector of parameters
 beta <- rep(c(0,1,0,-1,0), c(25,10,25,10,25))

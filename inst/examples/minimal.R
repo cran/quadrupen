@@ -1,5 +1,3 @@
-rm(list=ls())
-library(quadrupen)
 p <- 20
 n <- 10
 C <- bandSparse(p,k=0:1,diagonals=list(rep(1,p),rep(-1,p-1)))
