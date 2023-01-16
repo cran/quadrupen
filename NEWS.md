@@ -1,3 +1,7 @@
+# quadrupen 0.2-10
+
+  - Fix deprecated way of setting an output or error stream (Dirk E. PR)
+
 # quadrupen 0.2-9
 
   - Adaptation due to new Matrix version 1.4-2

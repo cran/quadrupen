@@ -132,19 +132,15 @@ at a grid of values for the infinity-penalty, fixing the amount of
 \eqn{\ell_2}{l2} regularization. See details for the criterion
 optimized.
 }
-\note{
-The optimized criterion is  
-
-\if{latex}{\deqn{%
+\details{
+The optimized criterion is  \if{latex}{\deqn{%
 \hat{\beta}_{\lambda_1,\lambda_1} = \arg \min_{\beta} \frac{1}{2}
 (y - X \beta)^T (y - X \beta) + \lambda_1 \|D \beta \|_{\infty} +
-\frac{\lambda_2}{2} \beta^T S \beta, }} \if{html}{\out{
-&beta;<sup>hat</sup>
-<sub>&lambda;<sub>1</sub>,&lambda;<sub>2</sub></sub> =
-argmin<sub>&beta;</sub> 1/2 RSS(&beta;) + &lambda;<sub>1</sub>
-&#124; D &beta; &#124;<sub>&infin;</sub> + &lambda;/2 <sub>2</sub>
-&beta;<sup>T</sup> S &beta;,}}
-
+\frac{\lambda_2}{2} \beta^T S \beta, }} 
+\if{html}{
+\out{
+&beta;<sup>hat</sup><sub>&lambda;<sub>1</sub>,&lambda;<sub>2</sub></sub> = argmin<sub>&beta;</sub> 1/2 RSS(&beta;) + &lambda;<sub>1</sub> &#124; D &beta; &#124;<sub>&infin;</sub> + &lambda;/2 <sub>2</sub> &beta;<sup>T</sup> S &beta;,
+}}
 \if{text}{\deqn{beta.hat(lambda1, lambda2) = argmin_beta 1/2
 RSS(beta) + lambda1 max|D beta| + lambda2 beta' S beta,}} where
 \eqn{D}{D} is a diagonal matrix, whose diagonal terms are provided
@@ -152,7 +148,6 @@ as a vector by the \code{penscale} argument. The \eqn{\ell_2}{l2}
 structuring matrix \eqn{S}{S} is provided via the \code{struct}
 argument, a positive semidefinite matrix (possibly of class
 \code{Matrix}).
-
 Note that the quadratic algorithm for the bounded regression may
 become unstable along the path because of singularity of the
 underlying problem, e.g. when there are too much correlation or
