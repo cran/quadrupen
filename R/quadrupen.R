@@ -71,7 +71,7 @@
 #'
 #' @param control list of argument controlling low level options of
 #' the algorithm --use with care and at your own risk-- :
-#' \itemize{%
+#' \describe{%
 #'
 #' \item{\code{verbose}: }{integer; activate verbose mode --this one
 #' is not too much risky!-- set to \code{0} for no output; \code{1}
@@ -312,7 +312,7 @@ elastic.net <- function(x,
 #'
 #' @param control list of argument controlling low level options of
 #' the algorithm --use with care and at your own risk-- :
-#' \itemize{%
+#' \describe{%
 #'
 #' \item{\code{verbose}: }{integer; activate verbose mode --this one
 #' is not too much risky!-- set to \code{0} for no output; \code{1}

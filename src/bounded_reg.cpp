@@ -28,10 +28,6 @@ SEXP bounded_reg(SEXP X        ,
 		 SEXP SPARSE   ,
 		 SEXP BULLETPROOF) {
 
-  // disable messages being printed to the err2 stream (armadillo's runtime error)
-  std::ostream nullstream(0);
-  arma_cerr_stream<char>(&nullstream);
-
   // Reading input variables
   bool intercept  = as<bool>   (INTERCEPT)   ; // boolean for intercept mode
   bool normalize  = as<bool>   (NORMALIZE)   ; // boolean for standardizing the predictor

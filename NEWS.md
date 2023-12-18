@@ -1,3 +1,7 @@
+# quadrupen 0.2-11
+
+  - Minor fix in documentation an error handling in armadillo
+
 # quadrupen 0.2-10
 
   - Fix deprecated way of setting an output or error stream (Dirk E. PR)
