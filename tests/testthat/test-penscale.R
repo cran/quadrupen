@@ -28,7 +28,7 @@ test_that("weighted_ quad2theo", {
   ## glmnet with intercept fit with quadrupen and the theory
   w <- 1/runif(p,0.5,1)
   w <- w/sum(w)*p ## to fit glmnet rescaling
-  lasso.glmn <- glmnet(x,y, penalty.factor=w,lambda.min.ratio=1e-2, thresh=1e-20)
+  lasso.glmn <- glmnet(x,y, penalty.factor= w,lambda.min.ratio=1e-2, thresh=1e-20)
   lasso.quad <- elastic.net(x,y, lambda1=lasso.glmn$lambda*sqrt(n), penscale = w, lambda2=0)
   
   expect_equivalent(as.matrix(t(lasso.glmn$beta)), as.matrix(lasso.quad@coefficients), tolerance = 1e-6)

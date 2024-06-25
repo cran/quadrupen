@@ -1,3 +1,7 @@
+# quadrupen 0.2-12
+
+  - Minor fix in penscale format (colvec) w.r.t armadillo 14
+
 # quadrupen 0.2-11
 
   - Minor fix in documentation an error handling in armadillo

@@ -1,3 +1,6 @@
+#' @keywords internal
+"_PACKAGE"
+
 #' Sparsity by Worst-Case Quadratic Penalties
 #'
 #' This package is designed to fit accurately several popular
@@ -123,8 +126,6 @@
 #' of the great \pkg{RcppArmadillo} package.
 #'
 #' @name quadrupen-package
-#' @aliases quadrupen
-#' @docType package
 #' @author Julien Chiquet \email{julien.chiquet@@inrae.fr}
 #'
 #' @references
@@ -149,6 +150,11 @@
 #' \item  Robert Tibshirani. Regression Shrinkage and Selection
 #' via the Lasso, JRSS(B), 1996.
 #' }
+
+# The following block is used by usethis to automatically manage
+# roxygen namespace tags. Modify with care!
+## usethis namespace: start
 #' @import Matrix parallel Rcpp methods ggplot2 reshape2 scales grid
 #' @useDynLib quadrupen
+## usethis namespace: end
 NULL

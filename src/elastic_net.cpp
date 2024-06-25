@@ -47,7 +47,7 @@ SEXP elastic_net(SEXP BETA0    ,
   uword  max_iter = as<int>    (MAXITER)   ; // max # of iterates of the active set
   uword  max_feat = as<int>    (MAXFEAT)   ; // max # of variables activated
 
-  vec    xty   ; // reponses to predictors vector
+  vec    xty   ; // responses to predictors vector
   vec    xbar  ; // mean of the predictors
   vec    meanx ; // mean of the predictors (rescaled)
   vec    normx ; // norm of the predictors

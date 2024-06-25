@@ -1,15 +1,15 @@
 Package: quadrupen
 Type: Package
 Title: Sparsity by Worst-Case Quadratic Penalties
-Version: 0.2-11
-Date: 2023-12-18
+Version: 0.2-12
+Date: 2024-06-25
 Authors@R: c(
   person("Julien", "Chiquet", role = c("aut", "cre"), email = "julien.chiquet@inrae.fr",
       comment = c(ORCID = "0000-0002-3629-3429"))
   )
 Description: Fits classical sparse regression models with
     efficient active set algorithms by solving quadratic problems as described by 
-    Grandvalet, Chiquet and Ambroise (2017) <arXiv:1210.2077>. Also provides a few 
+    Grandvalet, Chiquet and Ambroise (2017) <doi:10.48550/arXiv.1210.2077>. Also provides a few
     methods for model selection purpose (cross-validation, stability selection).
 License: GPL (>= 3)
 Depends: Rcpp, ggplot2, Matrix
@@ -21,9 +21,9 @@ Maintainer: Julien Chiquet <julien.chiquet@inrae.fr>
 URL: https://github.com/jchiquet/quadrupenCRAN
 BugReports: https://github.com/jchiquet/quadrupenCRAN/issues
 Encoding: UTF-8
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 Language: en-US
-Packaged: 2023-12-18 09:32:19 UTC; jchiquet
+Packaged: 2024-06-25 11:50:36 UTC; jchiquet
 Author: Julien Chiquet [aut, cre] (<https://orcid.org/0000-0002-3629-3429>)
 Repository: CRAN
-Date/Publication: 2023-12-18 09:50:02 UTC
+Date/Publication: 2024-06-25 12:10:02 UTC
