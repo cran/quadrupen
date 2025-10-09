@@ -14,7 +14,7 @@ stability(
   weakness = 0.5,
   verbose = TRUE,
   folds = replicate(subsamples, sample(1:nrow(x), sample.size), simplify = FALSE),
-  mc.cores = 2,
+  mc.cores = 1,
   ...
 )
 }
@@ -49,7 +49,7 @@ describing the folds to use for the stability procedure. By
 default, the folds are randomly sampled with the specified
 \code{subsamples} argument.}
 
-\item{mc.cores}{the number of cores to use. The default uses 2 cores.}
+\item{mc.cores}{the number of cores to use. The default uses 1 core.}
 
 \item{...}{additional parameters to overwrite the defaults of the
 fitting procedure. See the corresponding documentation

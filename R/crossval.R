@@ -32,7 +32,7 @@
 #' @param verbose logical; indicates if the progression (the current
 #' lambda2) should be displayed. Default is \code{TRUE}.
 #'
-#' @param mc.cores the number of cores to use. The default uses 2 cores.
+#' @param mc.cores the number of cores to use. The default uses 1 core.
 #'
 #' @param ... additional parameters to overwrite the defaults of the
 #' fitting procedure identified by the \code{'penalty'} argument. See
@@ -108,7 +108,7 @@ crossval <- function(x,
                      folds    = split(sample(1:nrow(x)), rep(1:K, length=nrow(x))),
                      lambda2  = 0.01,
                      verbose  = TRUE,
-                     mc.cores = 2,
+                     mc.cores = 1,
                      ...) {
 
   ## =============================================================

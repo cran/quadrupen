@@ -12,7 +12,7 @@ crossval(
   folds = split(sample(1:nrow(x)), rep(1:K, length = nrow(x))),
   lambda2 = 0.01,
   verbose = TRUE,
-  mc.cores = 2,
+  mc.cores = 1,
   ...
 )
 }
@@ -43,7 +43,7 @@ same folds for each \code{lambda2}).}
 \item{verbose}{logical; indicates if the progression (the current
 lambda2) should be displayed. Default is \code{TRUE}.}
 
-\item{mc.cores}{the number of cores to use. The default uses 2 cores.}
+\item{mc.cores}{the number of cores to use. The default uses 1 core.}
 
 \item{...}{additional parameters to overwrite the defaults of the
 fitting procedure identified by the \code{'penalty'} argument. See

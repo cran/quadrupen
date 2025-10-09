@@ -39,12 +39,12 @@ int quadra_enet(vec &x0,
     colvec x1_swap = x1.elem(swap);
     // first, go to zero for the swapped variable which cost the minimum
     vec gamma = -x0_swap / (x1_swap-x0_swap);
-    uword i_swap ;
-    double scale = gamma.min(i_swap) ;
+    uword i_swap = gamma.index_min();
+    double scale = gamma(i_swap) ;
     null = swap[i_swap];
     x1 = x0 + (x1-x0) * scale ;
     // second, solve the problem after swaping the signs of the
-    // increminated variable
+    // incriminated variable
     x0 = x1;
     x0(null[0]) = -x1_swap[i_swap];
 

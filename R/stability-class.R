@@ -207,8 +207,8 @@ setMethod("plot", "stability.path", definition =
      colnames(data.coef) <- c("xvar","var","prob","selection","variables")
 
      ## Build the ggplot object
-     d <- ggplot(data.coef,aes_(x=~xvar,y=~prob, linetype=~variables, colour=~selection, group=~var)) +
-       geom_line(aes_(x=~xvar,y=~prob)) +
+     d <- ggplot(data.coef,aes(x=.data$xvar,y=.data$prob, linetype=.data$variables, colour=.data$selection, group=.data$var)) +
+       geom_line(aes(x=.data$xvar,y=.data$prob)) +
          labs(x=switch(xvar,
                 "fraction" = expression(lambda[1]/max[lambda[1]]),
                 ifelse(log.scale,expression(log[10](lambda[1])),expression(lambda[1]))),
@@ -228,8 +228,8 @@ setMethod("plot", "stability.path", definition =
        d <- d + annotate("text", x=c(xv[length(xv)],xv[1],xv[iq]), y=c(cutoff,1,0), hjust=c(0,0,0.25), vjust=c(0,1.1,1.1),
                          label=c(paste("pi[thr]"),paste("PFER <=",PFER),paste("hat(q)==",round(q[iq],2))),
                          parse=TRUE, size=4, alpha=0.85)
-       d <- d + geom_hline(yintercept=cutoff, linetype="dashed", alpha=0.35, size=.5)
-       d <- d + geom_vline(xintercept=xv[iq], linetype="dashed", alpha=0.35, size=.5)
+       d <- d + geom_hline(yintercept=cutoff, linetype="dashed", alpha=0.35, linewidth=.5)
+       d <- d + geom_vline(xintercept=xv[iq], linetype="dashed", alpha=0.35, linewidth=.5)
      }
 
      if (plot) {print(d)}

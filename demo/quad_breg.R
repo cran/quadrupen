@@ -22,7 +22,7 @@ y <- mu + x %*% beta + rnorm(n, 0, sigma)
 
 ## Test simple and double cross-validation
 cv.double <- crossval(x, y, "bounded.reg", lambda2=10^seq(2,-2,len=50))
-cv.simple <- crossval(x, y, "bounded.reg", lambda2=slot(cv.double, "lambda2.min"))
+cv.simple <- crossval(x, y, "bounded.reg", lambda2=slot(cv.double, "lambda2.min"), mc.cores = 1)
 plot(cv.double)
 plot(cv.simple)
 fit <- bounded.reg(x,y,lambda2=slot(cv.double, "lambda2.min"))

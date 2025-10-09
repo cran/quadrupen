@@ -33,7 +33,7 @@
 #' @param verbose logical; indicates if the progression should be
 #' displayed. Default is \code{TRUE}.
 #'
-#' @param mc.cores the number of cores to use. The default uses 2 cores.
+#' @param mc.cores the number of cores to use. The default uses 1 core.
 #'
 #' @param ... additional parameters to overwrite the defaults of the
 #' fitting procedure. See the corresponding documentation
@@ -113,7 +113,7 @@ stability <- function(x,
                       weakness    = 0.5,
                       verbose     = TRUE,
                       folds       = replicate(subsamples, sample(1:nrow(x), sample.size), simplify=FALSE),
-                      mc.cores    = 2,
+                      mc.cores    = 1,
                       ...) {
 
   ## =============================================================
