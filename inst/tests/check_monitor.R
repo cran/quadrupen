@@ -2,6 +2,8 @@
 ##
 ## BASICALLY REPRODUCE THE EXAMPLE OF THE PAPER
 ## GRANDVALET. CHIQUET AND AMBROISE, SPARSITY BY WORST-CASE QUADRATIC PENALTIES
+rm(list=ls())
+library(quadrupen)
 
 ## OTHER TYPE OF DATA
 mu <- 3
@@ -11,7 +13,7 @@ cor <- 0.75
 beta <- rep(c(0,1,0,-1,0), c(25,10,25,10,25))
 Soo  <- toeplitz(cor^(0:24)) ## bloc correlation between zero variables
 Sww  <- matrix(cor,10,10) ## bloc correlation between active variables
-Sigma <- bdiag(Soo,Sww,Soo,Sww,Soo)
+Sigma <- Matrix::bdiag(Soo,Sww,Soo,Sww,Soo)
 p <- length(beta)
 
 diag(Sigma) <- 1
@@ -22,17 +24,20 @@ y <- 10 + x %*% beta + rnorm(n,0,10)
 subset <- sample(1:n, p/2)
 
 lambda2 <- 0.01
-fenchel <- elastic.net(x[subset, ], y[subset], lambda2=lambda2, nlambda1=6, control=list(monitor=2))
-grandvt <- elastic.net(x[subset, ], y[subset], lambda2=lambda2, nlambda1=6, control=list(monitor=1))
+fenchel <- elastic_net(x[subset, ], y[subset], lambda2=lambda2, nlambda1=6, control=list(monitor=2))
+grandvt <- elastic_net(x[subset, ], y[subset], lambda2=lambda2, nlambda1=6, control=list(monitor=1))
 
 ## TRICK FOR FOR LOG-SCALE...
-delta_fenchel <- fenchel@monitoring$dist.to.opt
+delta_fenchel <- fenchel$optim_monitoring$delta_hat
 delta_fenchel [delta_fenchel < .Machine$double.eps] <- .Machine$double.eps
 
-delta_grandvt <- grandvt@monitoring$dist.to.opt
+delta_grandvt <- grandvt$optim_monitoring$delta_hat
 delta_grandvt [delta_grandvt < .Machine$double.eps] <- .Machine$double.eps
 
-delta_optimal <- grandvt@monitoring$dist.to.str
+it_active <- grandvt$optim_monitoring$it_active
+J_hat  <- grandvt$optim_monitoring$gap_hat
+J_star <- rep(J_hat[c(1,cumsum(it_active))], it_active) 
+delta_optimal <- J_hat - J_star
 delta_optimal[delta_optimal < .Machine$double.eps] <- .Machine$double.eps
 
 plot(log10(delta_optimal), xlab="# iteration", type="l", lty=3, col="black", main="",

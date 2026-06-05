@@ -1,3 +1,5 @@
+rm(list=ls())
+library(quadrupen)
 ## Simulating multivariate Gaussian with blockwise correlation
 ## and piecewise constant vector of parameters
 beta <- rep(c(0,1,0,-1,0), c(25,10,25,10,25))
@@ -14,8 +16,27 @@ y <- 10 + x %*% beta + rnorm(n,0,10)
 ## and with structuiring prior
 labels <- rep("irrelevant", length(beta))
 labels[beta != 0] <- "relevant"
-plot(bounded.reg(x,y,lambda2=0) , label=labels) ## a mess
-plot(bounded.reg(x,y,lambda2=10), label=labels) ## good guy are the boundaries
-plot(bounded.reg(x,y,lambda2=10,struct=solve(Sigma)), label=labels) ## even better
 
-cat("\nDONE.\n")
+BREG0    <- bounded_reg(x,y,lambda2=0) 
+BREGNET  <- bounded_reg(x,y,lambda2=10)
+BREGSNET <- bounded_reg(x,y,lambda2=10 , struct=solve(Sigma))
+
+plot(BREG0, label=labels) ## a mess
+plot(BREGNET, label=labels) ## good guy are the boundaries
+plot(BREGSNET, label=labels) ## even better
+
+cv_breg0     <- cross_validate(BREG0)
+cv_bregnet   <- cross_validate(BREGNET)
+cv_bregnsnet <- cross_validate(BREGSNET)
+
+plot(cv_breg0)
+plot(cv_bregnet)
+plot(cv_bregnsnet)
+
+beta_breg0    <- BREG0$get_model("CV_1se")[-1]
+beta_bregnet  <- BREGNET$get_model("CV_1se")[-1]
+beta_bregsnet <- BREGSNET$get_model("CV_1se")[-1]
+
+
+
+

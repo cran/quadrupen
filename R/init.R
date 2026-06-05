@@ -1,11 +1,5 @@
 .onAttach <- function(...) {
-  welcome <- paste(""                                                      ,
-                   "------------------------------------------------------",
-                   "  'quadrupen' package version 0.2-13                   ",
-                   ""                                                      ,
-                   " Dev version on https://github.com/jchiquet/quadrupen ",
-                   "------------------------------------------------------",
-                   sep = "\n")
+  welcome <- paste("'quadrupen' package version 1.0-0", sep = "\n")
   packageStartupMessage(welcome)
 }
 

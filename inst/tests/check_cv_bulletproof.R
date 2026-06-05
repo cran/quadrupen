@@ -3,6 +3,7 @@
 ## CHECK CORRECT BEHAVIOR WHEN THE UNDERLYING BOUNDED.REG FUNCTION
 ## EXPERIENCES UNSTABILITY
 
+library(quadrupen)
 set.seed(111)
 ## mutivariate Gaussian data
 mu <- 3
@@ -21,13 +22,8 @@ y <- mu + x %*% beta + rnorm(n, 0, sigma)
 
 ## THESE SETTINGS SHOULD INDUCE EARLY STOPS: CHECK RELEVANCE OF THE
 ## CROSSVAL FUNCTION
+breg <- bounded_reg(x, y, lambda2=0, minratio=1e-2)
 
-## FIRST, with bulletproof mode: should go at the end of the path, but slow (proximal)
-cv.simple.bp  <- crossval(x, y, penalty="bounded.reg", lambda2=0, min.ratio=1e-5)
+## Bulletproof mode: should go at the end of the path, but slow (proximal)
+cv.simple.bp  <- cross_validate(breg)
 plot(cv.simple.bp)
-
-## SECOND, without bulletproof: early stop, fast, but possible larger
-## standard errors because of less points to average for small lambdas (irrelevant anyway in a sparse setting!)
-cv.simple.nbp <- crossval(x, y, penalty="bounded.reg", lambda2=0, min.ratio=1e-5, control=list(bulletproof=FALSE))
-plot(cv.simple.nbp)
-

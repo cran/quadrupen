@@ -1,6 +1,8 @@
 ## BOUNDED REGRESSION
 ##
 ## CHECK HANDLING OF UNSTABILITY ALONG THE PATH
+rm(list=ls())
+library(quadrupen)
 
 ## Reproduce cases where the quadratic solver fails: high correlation
 ## for ALL the features (including irrelevant), n = p, too small
@@ -20,8 +22,6 @@ n <- 100
 x <- as.matrix(matrix(rnorm(95*n),n,95) %*% chol(Sigma))
 y <- mu + x %*% beta + rnorm(n,0,10)
 
-## fails of the quadratic solver, correctly handled by 'bullet proof' mode...
-fit01 <- bounded.reg(x,y, lambda2=0,min.ratio=1e-4, control=list(bulletproof=FALSE)) ## Early fail in Cholesky decompostion ...
-fit11 <- bounded.reg(x,y, lambda2=0,min.ratio=1e-4)
-fit02 <- bounded.reg(x,y, lambda2=0.1,min.ratio=1e-4, control=list(bulletproof=FALSE)) ## out of convergence
-fit12 <- bounded.reg(x,y, lambda2=0.1,min.ratio=1e-4)
+## fails of the quadratic solver, correctly handled by 'bullet proof' mode (now forced)...
+fit11 <- bounded_reg(x,y, lambda2=0, minratio=1e-4)
+fit12 <- bounded_reg(x,y, lambda2=0.1, minratio=1e-4)

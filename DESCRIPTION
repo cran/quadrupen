@@ -1,30 +1,39 @@
 Package: quadrupen
 Type: Package
-Title: Sparsity by Worst-Case Quadratic Penalties
-Version: 0.2-13
-Date: 2025-10-09
-Authors@R: c(
-  person("Julien", "Chiquet", role = c("aut", "cre"), email = "julien.chiquet@inrae.fr",
-      comment = c(ORCID = "0000-0002-3629-3429"))
-  )
-Description: Fits classical sparse regression models with
-    efficient active set algorithms by solving quadratic problems as described by 
-    Grandvalet, Chiquet and Ambroise (2017) <doi:10.48550/arXiv.1210.2077>. Also provides a few
-    methods for model selection purpose (cross-validation, stability selection).
+Title: Sparse and Group Sparse Linear Models
+Version: 1.0-0
+Date: 2026-06-05
+Authors@R: 
+        person("Julien", "Chiquet", email = "julien.chiquet@inrae.fr", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-3629-3429"))
+Description: Fits the solution paths of classical sparse regression models with efficient active set algorithms by solving small sub-problems. Include LASSO, SCAD, MCP, (Sparse) Group-LASSO, Cooperative-LASSO, (Group) LAVA, (Generalized) Fused-Lasso and (Generalized) Elastic-Net. Also provides methods for model selection purpose (information criteria, cross-validation, stability selection).
+URL: https://github.com/jchiquet/quadrupen,
+        https://jchiquet.github.io/quadrupen/
+BugReports: https://github.com/jchiquet/quadrupen/issues
 License: GPL (>= 3)
-Depends: Rcpp, ggplot2, Matrix
-Imports: reshape2, methods, scales, grid, parallel
-Suggests: testthat, spelling, lars, elasticnet, glmnet
-LinkingTo: Rcpp, RcppArmadillo
-NeedsCompilation: yes
-Maintainer: Julien Chiquet <julien.chiquet@inrae.fr>
-URL: https://github.com/jchiquet/quadrupenCRAN
-BugReports: https://github.com/jchiquet/quadrupenCRAN/issues
 Encoding: UTF-8
-RoxygenNote: 7.3.3
 Language: en-US
-Packaged: 2025-10-09 07:48:25 UTC; jchiquet
+SystemRequirements: GNU make
+Depends: R (>= 4.1.0)
+Imports: dplyr, ggplot2, grid, Matrix, methods, parallel, R6, Rcpp,
+        rlang, scales, tidyr, lifecycle
+Suggests: elasticnet, glmnet, igraph, knitr, lars, MASS, ncvreg,
+        grpreg, rmarkdown, testthat
+LinkingTo: Rcpp, RcppArmadillo
+Collate: 'init.R' 'quadrupen-package.R' 'QuadrupenFit-R6Class.R'
+        'quadrupen-S3Methods.R' 'Regularizers-R6Class.R'
+        'DataModel-R6Class.R' 'StabilityPath-R6Class.R'
+        'CrossValidation-R6Class.R' 'InformationCriteria-R6Class.R'
+        'bounded-reg.R' 'fused-lasso.R' 'sparse_lm.R'
+        'sparse_lm_aliases.R' 'group_sparse_lm.R'
+        'group_sparse_lm_aliases.R' 'group-lava.R' 'lava.R' 'utils.R'
+        'ridge.R' 'RcppExports.R'
+Packaged: 2026-06-05 13:35:07 UTC; jchiquet
+Config/roxygen2/version: 8.0.0
+VignetteBuilder: knitr
+NeedsCompilation: yes
 Author: Julien Chiquet [aut, cre] (ORCID:
     <https://orcid.org/0000-0002-3629-3429>)
+Maintainer: Julien Chiquet <julien.chiquet@inrae.fr>
 Repository: CRAN
-Date/Publication: 2025-10-09 08:20:02 UTC
+Date/Publication: 2026-06-05 14:40:02 UTC

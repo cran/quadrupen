@@ -1,0 +1,219 @@
+---
+title: "Sparse Linear Regression with Quadrupen"
+subtitle: "A tour of standard analysis (fit, cross-validation, information criteria, stability) "
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{quadrupen-basics}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 4
+)
+```
+
+## Setup
+
+```{r setup}
+library(quadrupen)
+data("Birthwt", package = "grpreg")
+y <- Birthwt$bwt[-130] ## outlier
+X <- Birthwt$X[-130, ]
+```
+
+The `Birthwt` dataset contains birth weight data with `r nrow(Birthwt$X)` observations and `r ncol(Birthwt$X)` predictors. We use it throughout this vignette to illustrate sparse linear regression.
+
+## Fitting sparse linear models
+
+The main entry point is `sparse_lm()`, which fits a regularization path for several sparse penalties: `"l1"` (Lasso/Elastic-net), `"mcp"` (Minimax Concave Penalty) and `"scad"` (Smoothly Clipped Absolute Deviation). Convenience wrappers `lasso()`, `mcp()`, `scad()` and `elastic_net()` are also available.
+
+### Lasso
+
+```{r lasso-fit}
+fit_lasso <- lasso(X, y, minratio = 1e-2)
+fit_lasso
+```
+
+### SCAD
+
+SCAD is a non-convex penalty that matches the Lasso near the origin and tapers to a constant for large coefficients, thereby eliminating shrinkage bias for strong signals. The shape parameter `eta` must be greater than 2.
+
+```{r scad-fit}
+fit_scad <- scad(X, y, eta = 4, minratio = 1e-2)
+fit_scad
+```
+
+### MCP
+
+MCP applies a linearly diminishing marginal penalty that vanishes once a coefficient exceeds `eta × lambda1`, yielding near-unbiased estimates for large signals. The shape parameter `eta` must be greater than 1.
+
+```{r mcp-fit}
+fit_mcp <- mcp(X, y, eta = 3, minratio = 1e-2)
+fit_mcp
+```
+
+### Elastic-Net
+
+The Elastic-net combines an $\ell_1$ and an $\ell_2$ penalty, trading off sparsity against grouping of correlated predictors. The `lambda2` argument controls the ridge component.
+
+```{r enet-fit}
+fit_enet <- elastic_net(X, y, lambda2 = 1, minratio = 1e-2)
+fit_enet
+```
+
+### Fit objects
+
+All objects returned by `sparse_lm()` and its wrappers are R6 instances of the class `SparseFit`, inheriting from `QuadrupenFit`. These objects (see [`QuadrupenFit`]) store all data related to the fit, accessible directly via named fields (e.g., `fit_lasso$coefficients`, `fit_lasso$deviance`, `fit_lasso$degrees_freedom`; see `str(fit_lasso)` and the documentation).
+
+They also provide methods for visualizing and analyzing the fit, and for pursuing complementary analyses such as model selection, cross-validation, and stability selection. For users unfamiliar with R6 classes, S3 methods are exported for the most common operations (e.g., `plot(fit_lasso)` is equivalent to `fit_lasso$plot()`), but the R6 methods expose more options.
+
+## Regularization paths
+
+`$plot_path()` (or `plot(fit, type = "path")`) displays how coefficients evolve along the penalty path.
+
+```{r path-plots, fig.show='hold', out.width='50%'}
+fit_lasso$plot_path(xvar="fraction", log_scale = FALSE)
+fit_mcp$plot_path(labels = colnames(X))
+fit_scad$plot_path()
+fit_enet$plot_path(standardize=FALSE)
+```
+
+## Information criteria
+
+`$criteria()` computes AIC, BIC, mBIC, eBIC and GCV from the estimated degrees of freedom, storing the result as an [`InformationCriteria`] R6 object in the field `$information_criteria` of the current fit. This method is called automatically during fitting (`sparse_lm()` or any wrapper) at no additional computational cost, so users rarely need to invoke it manually — the main exception being when a custom penalty term is desired.
+
+```{r criteria}
+fit_lasso$criteria()
+```
+
+```{r criteria-plots, fig.show='hold', out.width='50%'}
+fit_lasso$plot(type = "criteria")
+```
+
+For greater flexibility, use the `plot` method of the `InformationCriteria` object directly to select which criteria to display:
+
+```{r criteria-plots-2, fig.show='hold', out.width='50%'}
+fit_lasso$information_criteria$plot(c("AIC", "BIC", "mBIC"))
+fit_mcp$information_criteria$plot("GCV")
+```
+
+## Model extraction
+
+`$get_model()` extracts the coefficient vector selected by a given criterion.
+
+```{r get-model}
+coef_lasso_bic <- fit_lasso$get_model("BIC")
+coef_mcp_bic   <- fit_mcp$get_model("BIC")
+
+cat("Non-zero Lasso coefficients (BIC):\n")
+print(coef_lasso_bic[coef_lasso_bic != 0])
+
+cat("\nNon-zero MCP coefficients (BIC):\n")
+print(coef_mcp_bic[coef_mcp_bic != 0])
+```
+
+An existing lambda value can also be passed directly:
+
+```{r get-model-lambda}
+lambda_lasso <- fit_lasso$major_tuning
+coef_lasso_lambda <- fit_lasso$get_model(lambda_lasso[18])
+
+cat("Non-zero Lasso coefficients for lambda = ", round(lambda_lasso[18], 2), "\n")
+print(coef_lasso_lambda[coef_lasso_lambda != 0])
+```
+
+## Cross-validation
+
+`$cross_validate()` performs K-fold cross-validation over the penalty grid, storing the result as a [`CrossValidation`] R6 object in the field `$cross_validation` of the current fit.
+
+```{r cv, message=FALSE}
+set.seed(42)
+fit_lasso$cross_validate(K = 10, verbose = FALSE)
+fit_mcp$cross_validate(K = 10, verbose = FALSE)
+```
+
+```{r cv-plots, fig.show='hold', out.width='50%'}
+fit_lasso$plot(type = "crossval")
+fit_mcp$plot(type = "crossval")
+```
+
+Model selection using the CV-minimizing penalty:
+
+```{r cv-model}
+coef_lasso_cv <- fit_lasso$get_model("CV_min")
+cat("Non-zero Lasso coefficients (CV min):\n")
+print(coef_lasso_cv[coef_lasso_cv != 0])
+```
+
+## Cross-validation on $\lambda_1 \times \lambda_2$
+
+For regularizers with two penalties (typically the Elastic-net), cross-validation can be run on a two-dimensional grid:
+
+```{r cv2D, message=FALSE}
+set.seed(42)
+fit_enet$cross_validate(K = 5, lambda2 = 10^seq(1, -3, len=20), verbose = FALSE)
+```
+
+```{r cv-plots-2D, fig.show='hold', out.width='50%'}
+fit_enet$plot(type = "crossval")
+fit_enet$cross_validation$plotCV_1D(se =  FALSE) + ggplot2::ylim(c(0.4, 0.55))
+```
+
+## Prediction
+
+`$predict()` returns fitted values for the whole path, or for a specific model selected by a criterion or a lambda value.
+
+```{r predict}
+## Predictions at the CV_min-selected model
+y_hat_lasso <- fit_lasso$predict(selection = "CV_min")
+y_hat_mcp   <- fit_mcp$predict(selection = "CV_min")
+y_hat_enet  <- fit_enet$predict(selection = "CV_min")
+
+## R² at the selected model
+r2_lasso <- fit_lasso$r_squared[fit_lasso$get_model("CV_min", type = "index")]
+r2_mcp   <- fit_mcp$r_squared[fit_mcp$get_model("CV_min", type = "index")]
+r2_enet  <- fit_enet$r_squared[fit_enet$get_model("CV_min", type = "index")]
+cat(sprintf("R² Lasso (CV_min): %.3f\nR² MCP   (CV_min): %.3f\nR² Enet  (CV_min): %.3f\n", r2_lasso, r2_mcp, r2_enet))
+```
+
+## Stability selection
+
+`$stability()` estimates selection probabilities via repeated sub-sampling (Meinshausen & Bühlmann, 2010). Variables that appear consistently across sub-samples receive high probabilities and are considered robustly selected. The stability path is stored as a [`StabilityPath`] R6 object in the field `$stability_path` of the current fit.
+
+```{r stability, message=FALSE}
+set.seed(42)
+fit_lasso$stability(n_subsamples = 200, verbose = FALSE)
+```
+
+```{r stability-plot}
+fit_lasso$plot(type = "stability")
+fit_lasso$stability_path$plot(nvarsel = 7)
+colnames(X)[fit_lasso$stability_path$selection(nvarsel = 7) ]
+```
+
+## Debiased Estimators
+
+Every $\ell_1$-based regularizer is known to be biased due to the shrinkage effect. A standard remedy is to refit the model on the selected support without penalization. This is implemented in **quadrupen** at no extra computational cost — the refitted coefficients are computed alongside the regularization path — and can be activated by setting the `$debias` field to `TRUE`.
+
+
+```{r debias}
+fit_lasso$debias <- TRUE
+fit_lasso$plot_path()
+```
+
+Since both versions are stored in the same object, it is straightforward to compare the regularized and debiased solutions — for the path as well as for CV error — by toggling `$debias`.
+
+```{r debias-cv}
+fit_lasso$cross_validate(verbose = FALSE)
+fit_lasso$plot(type = "crossval")
+fit_lasso$debias <- FALSE
+fit_lasso$plot_path()
+```
+
+Setting `$debias` back to `FALSE` restores the original regularized coefficients.
+

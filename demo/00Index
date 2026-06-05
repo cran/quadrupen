@@ -1,2 +1,3 @@
-quad_enet      a full example on how to use basic functionality of the 'elastic.net' function and its methods for the 'quadrupen' package.
-quad_breg      a full example on how to use basic functionality of the 'bounded.reg' function and its methods for the 'quadrupen' package.
+quad_enet      a full example on how to use basic functionality of the 'elastic_net' function and its methods for the 'quadrupen' package.
+quad_lasso     a full example on how to use basic functionality of the 'lasso' function and its methods for the 'quadrupen' package.
+quad_breg      a full example on how to use basic functionality of the 'bounded_reg' function and its methods for the 'quadrupen' package.
