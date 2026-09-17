@@ -69,8 +69,8 @@ df_truth <- data.frame(
   index     = rep(1:p, 3),
   value     = c(beta, delta, theta),
   component = factor(
-    rep(c("Sparse (β)", "Dense (δ)", "Total (θ = β + δ)"), each = p),
-    levels = c("Sparse (β)", "Dense (δ)", "Total (θ = β + δ)")
+    rep(c("Sparse (beta)", "Dense (delta)", "Total (theta = beta + delta)"), each = p),
+    levels = c("Sparse (beta)", "Dense (delta)", "Total (theta = beta + delta)")
   )
 )
 
@@ -176,21 +176,21 @@ df_lava_dense <- data.frame(
   method   = factor("LAVA (BIC)", levels = method_levels),
   index    = 1:p,
   value    = as.numeric(theta_hat),
-  fill_grp = "LAVA dense (δ̂)"
+  fill_grp = "LAVA dense (delta-hat)"
 )
 df_lava_sparse <- data.frame(
   method   = factor("LAVA (BIC)", levels = method_levels),
   index    = 1:p,
   value    = beta_hat,
-  fill_grp = "LAVA sparse (β̂)"
+  fill_grp = "LAVA sparse (beta-hat)"
 )
 
 fill_palette <- c(
-  "True signal"       = "grey20",
-  "Lasso"             = "#56B4E9",
-  "Elastic-net"       = "#E69F00",
-  "LAVA dense (δ̂)"   = "#CC79A7",
-  "LAVA sparse (β̂)"  = "#009E73"
+  "True signal"            = "grey20",
+  "Lasso"                  = "#56B4E9",
+  "Elastic-net"            = "#E69F00",
+  "LAVA dense (delta-hat)" = "#CC79A7",
+  "LAVA sparse (beta-hat)" = "#009E73"
 )
 
 ggplot(mapping = aes(x = index, y = value, fill = fill_grp)) +
@@ -200,7 +200,7 @@ ggplot(mapping = aes(x = index, y = value, fill = fill_grp)) +
   facet_wrap(~ method, ncol = 2) +
   scale_fill_manual(
     values = fill_palette,
-    breaks = c("LAVA sparse (β̂)", "LAVA dense (δ̂)"),
+    breaks = c("LAVA sparse (beta-hat)", "LAVA dense (delta-hat)"),
     name   = "LAVA decomposition"
   ) +
   labs(x = "Predictor index", y = "Estimated coefficient",

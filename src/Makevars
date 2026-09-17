@@ -11,6 +11,9 @@ OBJECTS=$(SOURCES:.cpp=.o)
 # Make the shared object
 all: $(SHLIB)
 
+# Most of the code lives in templated headers: rebuild the objects when a header changes
+$(OBJECTS): $(wildcard *.h Quadrupen/*.h FusedLasso/*.h)
+
 # Provide recipe to remove all objects
 clean:
 	@rm -f $(OBJECTS)

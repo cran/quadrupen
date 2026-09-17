@@ -107,6 +107,9 @@ cross-validation or stability selection.
 algorithm. Default is \code{FALSE}.
 \item \code{maxiter} the maximal number of iteration used in the active set algorithm
 to solve the problem for a given value of lambda1 . Default is 50.
+\item \code{maxadd} the maximal number of variables (or groups, for group-sparse models)
+activated at once in the active set algorithm, chosen among the largest violations
+of the optimality conditions. Default is 10 (5 for group-sparse models).
 \item \code{method} a string for the underlying solver used. Either
 \code{"quadra"}, \code{"fista"} or \code{"pgd"}. Default is \code{"quadra"}.
 \item \code{factmat} Boolean indicating if matrix factorization should be used to

@@ -38,18 +38,27 @@ List RidgeRegression::solution_path(const mat& C_inv) {
   Xwc.each_row() -= data_.X_bar_.t() ;
   Xwc.each_col() %= sqrtW ;
 
-  vec eta ; mat U, V ;
-  svd_econ(U, eta, V, Xwc * C_inv) ;
-
-  mat C_invV = C_inv * V ;
+  vec eta ; mat U, V, C_invV ;
+  if (C_inv.is_empty()) {
+    // S diagonal: C^{-1} = diag(1/sqrt(s)) acts as a column scaling, no p x p algebra
+    const vec c = 1.0 / sqrt(vec(data_.S_.diag())) ;
+    Xwc.each_row() %= c.t() ;
+    svd_econ(U, eta, V, Xwc) ;
+    C_invV = V.each_col() % c ;
+  } else {
+    svd_econ(U, eta, V, Xwc * C_inv) ;
+    C_invV = C_inv * V ;
+  }
   vec Uty    = U.t() * (sqrtW % (data_.y_ - data_.y_bar_)) ;
 
   vector<double> timing ; // successive timing for solving for each lambda value
+  coef_.set_size(data_.p_, lambdas_.size()) ;
+  uword i = 0 ;
   wall_clock timer ; timer.tic(); // clock
   for(auto lambda : lambdas_) {
     // computing the structured ridge estimate
-    beta_ = (C_invV * diagmat(eta/(square(eta) + lambda)) * Uty) ;
-    coef_ = join_rows(coef_, beta_ / data_.norm_X_) ;
+    beta_ = C_invV * (eta / (square(eta) + lambda) % Uty) ;
+    coef_.col(i++) = beta_ / data_.norm_X_ ;
     // estimating the intercept term
     intercept_.push_back(data_.y_bar_ - dot(beta_, data_.X_bar_));  
     // computing the estimated degrees of freedom

@@ -43,6 +43,9 @@ public:
   
   // Compute degrees of freedom for the current estimate
   double get_df() ; 
+
+  // Violation of the optimality conditions of the current estimate
+  double optimality_gap(const vec& grad, const double lambda) const ;
   
 };
 

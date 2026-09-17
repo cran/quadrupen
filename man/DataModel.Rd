@@ -42,6 +42,7 @@ Class for storing data and various fixed quantity
     \item \href{#method-DataModel-initialize}{\code{DataModel$new()}}
     \item \href{#method-DataModel-CholStruct}{\code{DataModel$CholStruct()}}
     \item \href{#method-DataModel-splitTrainTest}{\code{DataModel$splitTrainTest()}}
+    \item \href{#method-DataModel-splitFold}{\code{DataModel$splitFold()}}
     \item \href{#method-DataModel-splitSubSamples}{\code{DataModel$splitSubSamples()}}
     \item \href{#method-DataModel-clone}{\code{DataModel$clone()}}
   }
@@ -106,6 +107,28 @@ Class for storing data and various fixed quantity
     \describe{
       \item{\code{nfolds}}{the number of folds}
       \item{\code{folds}}{a list of vectors describing the folds (optional)}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    a list with train and test data and id.
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DataModel-splitFold"></a>}}
+\if{latex}{\out{\hypertarget{method-DataModel-splitFold}{}}}
+\subsection{\code{DataModel$splitFold()}}{
+  a function splitting the data into one train and one test set
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DataModel$splitFold(omit)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{omit}}{vector of the indices of the test observations}
     }
     \if{html}{\out{</div>}}
   }

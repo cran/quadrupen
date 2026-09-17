@@ -123,7 +123,7 @@ QuadrupenFit <- R6::R6Class(
       }
     },
     #' @field residuals Matrix of residuals, each column corresponding to a value of `lambda1`.
-    residuals       = function(value) {apply(self$fitted, 2, function(y_hat) private$data_$y - y_hat)},
+    residuals       = function(value) {as.matrix(as.numeric(private$data_$y) - self$fitted)},
     #' @field deviance the model deviance
     deviance        = function(value) {colSums(self$residuals^2)},
     #' @field degrees_freedom Estimated degree of freedoms for the successive `lambda1`.
@@ -131,7 +131,7 @@ QuadrupenFit <- R6::R6Class(
     #' @field r_squared vector giving the coefficient of determination as a function of lambda1.
     r_squared       = function(value) {
       rss <- sum((private$data_$y - ifelse(private$has_intercept_, mean(private$data_$y), 0))^2)
-      1 - colSums(self$residuals^2) / rss
+      1 - self$deviance / rss
     },
     #' @field information_criteria object with class [`InformationCriteria`] storing various information criteria 
     #' (AIC, BIC, GCV, etc) for the current fit.
@@ -317,14 +317,14 @@ QuadrupenFit <- R6::R6Class(
               nlambda1, ",", nlambda2, ") tuning parameters\n", sep = "")
         }
 
-        ## Same data splitting is kept for varying lambda2 values
-        CVData <- self$dataModel$splitTrainTest(K, folds)
-
+        ## Same data splitting is kept for varying lambda2 values. Each fold's data is built
+        ## inside its job, so that the K copies of the design do not live in memory at once
         ## CV err for a fixed couple fold/lambda2
         one_fold <- function(fold, lambda2) {
           if (verbose & (fold == 1)) cat(round(lambda2, 3),"\t")
           regParam[[2]] <- lambda2
-          out <- private$optimizer(CVData[[fold]]$trainData, private$has_intercept_, regParam, control)
+          fold_data <- self$dataModel$splitFold(folds[[fold]])
+          out <- private$optimizer(fold_data$trainData, private$has_intercept_, regParam, control)
           if (private$debias_) {
             intercept   <- out$intercept_debiased
             coef <- out$coef_debiased
@@ -332,8 +332,8 @@ QuadrupenFit <- R6::R6Class(
             intercept   <- out$intercept
             coef <- out$coef
           }
-          y_hat <- scale(CVData[[fold]]$testData$X %*% coef, -intercept, FALSE)
-          err <- sweep(y_hat, 1L, CVData[[fold]]$testData$y)^2
+          y_hat <- scale(fold_data$testData$X %*% coef, -intercept, FALSE)
+          err <- sweep(y_hat, 1L, fold_data$testData$y)^2
           if (ncol(err) < length(regParam[[1]])) {
             NAs <- length(regParam[[1]]) - ncol(err)
             err <- cbind(err, matrix(NA, nrow(err),NAs))
@@ -486,21 +486,24 @@ QuadrupenFit <- R6::R6Class(
                           setNames(c(2, log(self$nobs), log(self$nvar), log(self$nobs) + 2*log(self$nvar)),
                                    c("AIC","BIC", "mBIC", "eBIC")), sigma=NULL) {
       
+      ## deviance is an active binding computing the residuals: evaluate it once
+      dev <- self$deviance
+      df  <- self$degrees_freedom
       if (is.null(sigma)) {
-        crit <- sapply(penalty, function(pen) self$nobs*log(self$deviance/self$nobs) + pen * self$degrees_freedom)
+        crit <- sapply(penalty, function(pen) self$nobs*log(dev/self$nobs) + pen * df)
       } else {
-        crit <- sapply(penalty, function(pen) self$deviance/sigma^2 + pen * self$degrees_freedom)
+        crit <- sapply(penalty, function(pen) dev/sigma^2 + pen * df)
       }
       crit <- as.data.frame(crit)
       ## Compute generalized cross-validation
-      crit$GCV <- self$deviance/(self$nobs*(1 - self$degrees_freedom/self$nobs)^2)
+      crit$GCV <- dev/(self$nobs*(1 - df/self$nobs)^2)
       
       ## Put together all relevant information about those criteria
       private$infocrit <- 
         InformationCriteria$new(
           value = data.frame(
             crit, 
-            df        = self$degrees_freedom, 
+            df        = df, 
             lambda    = self$major_tuning, 
             fraction  = colSums(abs(private$coef_))/max(colSums(abs(private$coef_))), 
             row.names = 1:nrow(crit)

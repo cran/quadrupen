@@ -1,8 +1,8 @@
 Package: quadrupen
 Type: Package
 Title: Sparse and Group Sparse Linear Models
-Version: 1.0-0
-Date: 2026-06-05
+Version: 1.1-0
+Date: 2026-09-17
 Authors@R: 
         person("Julien", "Chiquet", email = "julien.chiquet@inrae.fr", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-3629-3429"))
@@ -28,7 +28,7 @@ Collate: 'init.R' 'quadrupen-package.R' 'QuadrupenFit-R6Class.R'
         'sparse_lm_aliases.R' 'group_sparse_lm.R'
         'group_sparse_lm_aliases.R' 'group-lava.R' 'lava.R' 'utils.R'
         'ridge.R' 'RcppExports.R'
-Packaged: 2026-06-05 13:35:07 UTC; jchiquet
+Packaged: 2026-09-17 16:53:58 UTC; jchiquet
 Config/roxygen2/version: 8.0.0
 VignetteBuilder: knitr
 NeedsCompilation: yes
@@ -36,4 +36,4 @@ Author: Julien Chiquet [aut, cre] (ORCID:
     <https://orcid.org/0000-0002-3629-3429>)
 Maintainer: Julien Chiquet <julien.chiquet@inrae.fr>
 Repository: CRAN
-Date/Publication: 2026-06-05 14:40:02 UTC
+Date/Publication: 2026-09-17 18:00:02 UTC

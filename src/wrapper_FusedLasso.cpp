@@ -64,8 +64,8 @@ List FusedLasso_cpp(
   vec normx ;
   if (normalize) {
     normx = sqrt(trans(sum(square(sp_x),0)));
-    for (uword i=0; i<p; i++) {
-      sp_x.col(i) /= normx(i);
+    for (auto it = sp_x.begin(); it != sp_x.end(); ++it) {
+      *it /= normx(it.col());
     }
   } else {
     normx = ones(p);

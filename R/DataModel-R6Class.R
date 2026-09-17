@@ -72,14 +72,18 @@ DataModel <- R6::R6Class(
     nfolds = 10, folds  = split(sample(1:self$n), rep(1:nfolds, length = self$n))
     ) {
       ## create the list of split each compose with couple of Train/Test
-      lapply(folds, function(omit) {
-        trainData <- DataModel$new(self$X[-omit, , drop = FALSE], self$y[-omit], self$S, self$wy[-omit])
-        testData  <- DataModel$new(self$X[ omit, , drop = FALSE], self$y[omit], self$S, self$wy[omit])
-        trainData$C_inv <- self$C_inv # Cholesky factorization remain the same
-        testData$C_inv  <- self$C_inv # 
-        list(trainData = trainData, testData = testData,
-             trainID = setdiff(1:self$n, omit), testID = omit)
-      })
+      lapply(folds, self$splitFold)
+    },
+    #' @description a function splitting the data into one train and one test set
+    #' @param omit vector of the indices of the test observations
+    #' @return a list with train and test data and id.
+    splitFold = function(omit) {
+      trainData <- DataModel$new(self$X[-omit, , drop = FALSE], self$y[-omit], self$S, self$wy[-omit])
+      testData  <- DataModel$new(self$X[ omit, , drop = FALSE], self$y[omit], self$S, self$wy[omit])
+      trainData$C_inv <- self$C_inv # Cholesky factorization remain the same
+      testData$C_inv  <- self$C_inv #
+      list(trainData = trainData, testData = testData,
+           trainID = setdiff(1:self$n, omit), testID = omit)
     },
     #' @description a function splitting data into subsamples
     #' @param n_subsamples the number of subsamples

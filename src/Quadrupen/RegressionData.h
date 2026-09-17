@@ -25,6 +25,16 @@ using arma::ones;
 using Rcpp::Environment;
 using Rcpp::as;
 
+// True when S is diagonal with a positive diagonal (its Cholesky factor is then diag(sqrt(s)))
+inline bool is_positive_diagonal(const sp_mat& S) {
+  uword n_diag = 0 ;
+  for (auto it = S.begin(); it != S.end(); ++it) {
+    if (it.row() != it.col() || *it <= 0.0) return false ;
+    n_diag++ ;
+  }
+  return n_diag == S.n_rows ;
+}
+
 // Use template to handle dense or sparse encoding (mat/sp_mat in armadillo)
 template <typename matrix>
 class RegressionData {
@@ -101,8 +111,9 @@ void RegressionData<matrix>::scale_struct(const double gamma) {
 template <typename matrix>
 void RegressionData<matrix>::precompute_XTX() {
   mat WX = X_ ;
-  WX.each_col() %= weights_ ;
-  XTX_ = X_.t() * WX - n_w_ * X_bar_ * X_bar_.t() + S_ ;
+  WX.each_col() %= sqrt(weights_) ;
+  XTX_ = WX.t() * WX ; // A'A form: evaluated with syrk
+  XTX_ += S_ - n_w_ * X_bar_ * X_bar_.t() ;
 };
 
 template <typename matrix>

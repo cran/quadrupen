@@ -1,5 +1,27 @@
 NEWS/Changelog
 
+# quadrupen 1.1-0	(2026-09-17)
+
+- performance
+  - active set: no reallocation of the Gram matrices when variables enter or leave the model, LAPACK triangular solves, in-place Cholesky downdates
+  - several variables (or groups) activated at once in the working set algorithm
+    (new control option `maxadd`, default 10 for sparse models and 5 for group models)
+  - proximal solvers: adaptive restart of FISTA, safer Lipschitz constant (Lanczos), step-invariant stopping rule and safeguarded Anderson acceleration for PGD
+  - exact block coordinate descent with Newton steps for the `quadra` method of group models
+  - ridge and lava: no p x p algebra for a diagonal structuring matrix (the default)
+  - faster information criteria; cross-validation folds built on demand (less memory)
+  - typical speed-ups over 1.0-0 with default settings: x2 to x4 for lasso, MCP and SCAD, x5 to x15 for group models, x9 to x36 for elastic-net and sparse designs with large active sets, x8 for ridge and x30 for lava with p = 8000; all lambdas now converge on these cases
+- bug fixes (results may change)
+  - robustness when the active set exceeds the rank of the design (no more failure of the Cholesky factorization or of the direct solve)
+  - `bounded_reg()` with `method = "quadra"` (the default) stopped too early and could return suboptimal solutions; the optimality gap is now computed from the exact KKT conditions
+  - l1/linf group penalty: wrong proximal operator when the group lies in the l1 ball (`fista` and `pgd` converged to wrong solutions)
+  - `quadra` method for group models: exact solution of each block; sparse-group, coop and l1/linf variants now converge
+  - proximal solvers could stop after one iteration on badly scaled data
+  - convergence status now reflects the final optimality gap
+  - the Lipschitz constant estimation no longer draws from R's random number generator
+- minor updates
+  - objects are rebuilt when a C++ header changes; `ARMA_NO_DEBUG` also on Windows
+
 # quadrupen 1.0-0	(2026-06-05)
 
 - major updates

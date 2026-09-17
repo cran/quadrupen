@@ -102,6 +102,9 @@ vec GroupPenalty<GroupSparseNorm::L1LINF>::proximal(const vec& x, double lambda,
       
       // Proximal L_inf : x_k = sign(x_k) * min(|x_k|, rho)
       x_k = sign(x_k) % min(abs(x_k), rho * ones(size) );
+    } else {
+      // x_k lies in the L1 ball: its projection is itself, so prox_inf(x_k) = 0
+      x_k.zeros();
     }
     
     res.subvec(ind, ind + size - 1) = x_k;

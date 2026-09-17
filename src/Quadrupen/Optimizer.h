@@ -27,9 +27,9 @@ public:
   double accuracy_ = 1e-4, gap_ = 0.0, J_ = 0.0, D_ = 0.0 ;
   bool verbosity_  = false ;
   uword iter_ = 0, maxiter_ = 1000, maxfeat_ = 0, monitoring_ = 0 ;
+  uword max_add_ = 1 ; // max # of variables (or groups) activated at once in the working set
   vector<uword> inner_iter_   ;
   vector<double> J_vec_, D_vec_ ;
-  vec q_lipschitz_ ; // warm-start eigenvector for power iteration in estimate_lipschitz
   
   uword conjugate_gradient(
       vec& x0,
@@ -38,10 +38,18 @@ public:
       const double& accuracy,
       const uword& max_iter) ;
 
+  // Indices of the inactive elements with the largest KKT violations above tol,
+  // at most max_add of them, sorted by decreasing violation
+  uvec select_violators(
+      const vec& optimality,
+      const uvec& is_in,
+      const double& tol,
+      const uword& max_add) const ;
+
   double estimate_lipschitz(
       const mat& XTX,
-      uword max_it = 15,
-      double tol = 1e-4
+      uword max_it = 30,
+      double tol = 1e-3
   ) ;
   
   uword fista(

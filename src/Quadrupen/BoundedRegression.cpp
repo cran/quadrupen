@@ -49,17 +49,43 @@ double BoundedRegression::get_df() {
 
   double df = data_.centered_ + unbounded_.size();
 
-  if (gamma_ > 0) {
+  if (gamma_ > 0 && !unbounded_.is_empty()) {
     mat C = inv_sympd(data_.XTX_(unbounded_,unbounded_));
     uword ku = unbounded_.size();
-    mat SUU(ku, ku);
-    for (uword i = 0; i < ku; i++)
-      for (uword j = i; j < ku; j++)
-        SUU(j, i) = SUU(i, j) = data_.S_.at(unbounded_(i), unbounded_(j));
-    df -= trace(SUU * C);
+    // position of each unbounded variable, then a single pass over the non-zeros of S
+    std::vector<long> pos(data_.p_, -1);
+    for (uword i = 0; i < ku; i++) pos[unbounded_(i)] = i;
+    mat SUU(ku, ku, fill::zeros);
+    for (auto it = data_.S_.begin(); it != data_.S_.end(); ++it) {
+      if (pos[it.row()] >= 0 && pos[it.col()] >= 0) SUU(pos[it.row()], pos[it.col()]) = *it;
+    }
+    df -= accu(SUU % C); // trace(SUU * C) for symmetric matrices
   }
 
   return(df);
+}
+
+double BoundedRegression::optimality_gap(const vec& grad, const double lambda) const {
+  // KKT conditions of min 1/2 b'Hb - c'b + lambda max_i w_i |b_i|, with g = Hb - c:
+  //  - b = 0 : sum_i |g_i| / w_i <= lambda
+  //  - b != 0, B = {i : w_i |b_i| = max} : g_i = 0 outside B, sign(g_i) = -sign(b_i) on B
+  //    and sum_{i in B} |g_i| / w_i = lambda
+  const vec& w = lambda_factor_ ;
+  const vec wb = abs(beta_) % w ;
+  const double bound = wb.max() ;
+  const vec gw = abs(grad) / w ;
+  if (bound == 0.0) return std::max(0.0, accu(gw) - lambda) ;
+
+  double gap = 0.0, dual_B = 0.0 ;
+  for (uword i = 0; i < beta_.n_elem; ++i) {
+    if (wb(i) >= bound * (1.0 - 1e-8)) {
+      dual_B += gw(i) ;
+      if (grad(i) * beta_(i) > 0.0) gap = std::max(gap, gw(i)) ;
+    } else {
+      gap = std::max(gap, gw(i)) ;
+    }
+  }
+  return std::max(gap, std::abs(dual_B - lambda)) ;
 }
 
 List BoundedRegression::solution_path(const List& control) {
@@ -86,6 +112,7 @@ List BoundedRegression::solution_path(const List& control) {
   } ;
 
   // LAMBDA LOOP
+  coef_.set_size(data_.p_, lambdas_.size()) ;
   wall_clock timer ; timer.tic(); // clock
   for(auto lambda_ : lambdas_) {
     if (verbose) {Rprintf("\n lambda_linf = %f",lambda_) ;}
@@ -100,6 +127,8 @@ List BoundedRegression::solution_path(const List& control) {
         ioptim.push_back(
           solver_.fista(beta_, lambda_, data_.XTy_, data_.XTX_, prox, 1e-5, 10000)
         );
+        grad_ = - data_.XTy_ + data_.XTX_ * beta_ ;
+        current_gap = optimality_gap(grad_, lambda_) / std::max(1.0, lambda_) ;
         break;
       } else { // QUADRA solver
         try {
@@ -119,16 +148,16 @@ List BoundedRegression::solution_path(const List& control) {
         }
       }
 
-      // OPTIMALITY TESTING
+      // OPTIMALITY TESTING (relative to lambda, as the gradient scales with the data)
       grad_ = - data_.XTy_ + data_.XTX_ * beta_ ;
-      current_gap = sum(penalty_.optimality(grad_, lambda_, lambda_factor_)) ;
+      current_gap = optimality_gap(grad_, lambda_) / std::max(1.0, lambda_) ;
     } while ((current_gap > accuracy) && (current_it <= maxiter));
 
     // Checking convergence status
-    gap.push_back(fmax(0.0, sum(penalty_.optimality(grad_, lambda_, lambda_factor_)))) ;
+    gap.push_back(current_gap) ;
     iactive.push_back(current_it) ;
     status.push_back(0) ;
-    if (current_it >= maxiter) { status.back() = 1 ; }
+    if (current_gap > accuracy) { status.back() = 1 ; }
     if ((unbounded_.n_elem > maxfeat) & 
         (algorithm == SolverType::QUADRA)) { status.back() = 2 ; }
 
@@ -136,7 +165,7 @@ List BoundedRegression::solution_path(const List& control) {
     if (status.back() >= 2) {
       break;
     } else {
-      coef_ = join_rows(coef_, beta_/data_.norm_X_) ;
+      coef_.col(df_.size()) = beta_/data_.norm_X_ ;
       intercept_.push_back(data_.y_bar_ - dot(beta_, data_.X_bar_));
       double max_abs = max(abs(beta_));
       bounded_.push_back(find(abs(beta_) >= max_abs * (1.0 - 1e-10))) ;
@@ -147,6 +176,7 @@ List BoundedRegression::solution_path(const List& control) {
   } // END OF THE LOOP OVER LAMBDA
 
   lambdas_.resize(df_.size()) ;
+  coef_ = coef_.head_cols(df_.size()) ;
   
   return(
     List::create(

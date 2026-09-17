@@ -158,7 +158,7 @@ ggplot(df_coef, aes(x = index, y = value)) +
   facet_wrap(~ method, ncol = 2) +
   labs(x = "Predictor index", y = "Estimated coefficient",
        title = "Coefficient recovery by method",
-       subtitle = "Dashed line: true β",
+       subtitle = "Dashed line: true beta",
        colour = "Segment") +
   theme_bw() +
   theme(legend.position = "bottom")

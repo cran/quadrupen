@@ -83,7 +83,8 @@ ridge <- function(x,
     cov_struct  = struct,
     obs_weights = weights
   )
-  myData$CholStruct()
+  ## the C++ side does not need the inverse Cholesky factor of a positive diagonal structure
+  if (!(Matrix::isDiagonal(myData$S) && all(Matrix::diag(myData$S) > 0))) myData$CholStruct()
 
   ## ============================================
   ## INSTANTIATE THE PENALTY MODEL

@@ -18,7 +18,23 @@ monitoring_(control["monitor"]) {
   if (as<std::string>(control["method"]) == "FISTA") algorithm_ = SolverType::FISTA;
   if (as<std::string>(control["method"]) == "QUADRA") algorithm_ = SolverType::QUADRA;
   if (as<std::string>(control["method"]) == "PGD") algorithm_ = SolverType::PGD;
-  
+  if (control.containsElementNamed("maxadd")) max_add_ = std::max<uword>(1, as<uword>(control["maxadd"]));
+}
+
+uvec Optimizer::select_violators(
+  const vec& optimality,
+  const uvec& is_in,
+  const double& tol,
+  const uword& max_add) const {
+
+  uvec candidates = find(optimality > tol && is_in == 0) ;
+  if (candidates.n_elem > max_add) {
+    uvec order = sort_index(optimality(candidates), "descend") ;
+    candidates = candidates(order.head(max_add)) ;
+  } else if (candidates.n_elem > 1) {
+    candidates = candidates(sort_index(optimality(candidates), "descend")) ;
+  }
+  return candidates ;
 }
 
 double Optimizer::estimate_lipschitz(
@@ -30,40 +46,40 @@ double Optimizer::estimate_lipschitz(
   if (pk == 0) return 1.0;
   if (pk == 1) return as_scalar(XTX(0,0));
 
-  // Warm-start from previous eigenvector when size matches; random init otherwise
-  vec q;
-  if (q_lipschitz_.n_elem == pk) {
-    q = q_lipschitz_;
-  } else {
-    q = randu<vec>(pk);
-    q /= norm(q, 2);
+  // Lanczos iterations (no reorthogonalization) for the largest eigenvalue of XTX.
+  // Unlike the power iteration, it converges fast even when the top eigenvalues are close.
+  // Deterministic start: no draw from R's random number generator.
+  uword m = std::min(max_it, pk);
+  vec v = ones<vec>(pk) + 0.1 * arma::sin(regspace<vec>(1, pk));
+  v /= norm(v, 2);
+  vec v_old(pk, fill::zeros), alpha(m, fill::zeros), beta(m, fill::zeros);
+  double b = 0.0, theta = 0.0, residual = datum::inf;
+
+  for (uword j = 0; j < m; ++j) {
+    vec w = XTX * v;
+    alpha(j) = dot(w, v);
+    w -= alpha(j) * v + b * v_old;
+    b = norm(w, 2);
+    beta(j) = b;
+
+    bool breakdown = (b <= 1e-12 * std::abs(alpha(j)));
+    if (breakdown || j == m - 1 || (j + 1) % 5 == 0) {
+      // Largest Ritz value and its residual bound |beta_j * s_j|
+      mat T(j + 1, j + 1, fill::zeros);
+      T.diag() = alpha.head(j + 1);
+      if (j > 0) { T.diag(1) = beta.head(j); T.diag(-1) = beta.head(j); }
+      vec ritz; mat S;
+      eig_sym(ritz, S, T);
+      theta = ritz(j);
+      residual = std::abs(b * S(j, j));
+      if (breakdown || residual <= tol * theta) break;
+    }
+    v_old = v;
+    v = w / b;
   }
 
-  double lambda = 0.0;
-  double lambda_old = 0.0;
-
-  for (uword i = 0; i < max_it; ++i) {
-    vec z = XTX * q;
-
-    // Largest eigenvalue (simplified Rayleigh quotient since ||q||=1)
-    lambda = dot(q, z);
-    if (i > 0 && std::abs(lambda - lambda_old) < tol * lambda) {
-      break;
-    }
-    lambda_old = lambda;
-
-    double n = norm(z, 2);
-    if (n > 1e-15) {
-      q = z / n;
-    } else {
-      break;
-    }
-  }
-
-  q_lipschitz_ = q; // save for next call
-
-  // Safety margin for 1/L
-  return lambda * 1.01;
+  // theta underestimates the largest eigenvalue; theta + residual bounds it in practice
+  return std::max({theta + residual, 1.01 * theta, XTX.diag().max()});
 }
 
 uword Optimizer::pgd(
@@ -83,24 +99,42 @@ uword Optimizer::pgd(
 
   double invL = 1.0 / ((L_cache > 0) ? L_cache : estimate_lipschitz(XTX)); 
   uword iter = 0;
+  uword hist = 0; // number of (x_k, f_k) pairs stored since the last restart
   double delta = 2.0 * accuracy;
-  
+  double delta_prev = datum::inf;
+  bool accelerated = false; // was the current beta obtained by extrapolation?
+  vec beta_plain;           // plain proximal gradient step computed at the previous iterate
+
   while (delta > accuracy && iter < max_iter) {
     // 1. Point fixe standard (G(x))
     vec beta_next = proximal_operator(beta - (XTX * beta - XTy) * invL, lambda * invL);
     vec f_k = beta_next - beta;
-    
-    delta = norm(f_k, 2);
-    
+
+    delta = norm(f_k, 2) / invL; // norm of the gradient mapping, invariant to the step size
+
+    // Safeguard: plain proximal gradient steps do not increase the fixed-point residual.
+    // If the extrapolated point did, reject it, fall back to the plain step and drop the history.
+    if (accelerated && delta > delta_prev) {
+      beta = beta_plain ;
+      accelerated = false ;
+      hist = 0 ;
+      delta = delta_prev ;
+      iter++;
+      continue ;
+    }
+    delta_prev = delta;
+    accelerated = false ;
+
     if (iter == 0 || m == 0) {
       beta = beta_next;
     } else {
       // 2. Préparation des données pour l'accélération
-      uword col_idx = (iter - 1) % m; // On stocke l'itéré PRÉCÉDENT
+      uword col_idx = hist % m;       // On stocke l'itéré PRÉCÉDENT
       mat_X.col(col_idx) = beta;      // l'itéré x_k
       mat_F.col(col_idx) = f_k;       // son résidu f_k
-      
-      uword current_m = std::min(iter, m);
+      hist++;
+
+      uword current_m = std::min(hist, m);
 
       if (current_m > 1) {
         // Anderson mixing (type II): dF(:,j) = f_j - f_k (differences from current residual)
@@ -114,7 +148,9 @@ uword Optimizer::pgd(
           for (uword j = 0; j < current_m; ++j) {
             beta_accel += gamma(j) * (mat_X.col(j) + mat_F.col(j) - beta_next);
           }
+          beta_plain = std::move(beta_next);
           beta = beta_accel;
+          accelerated = true;
         } else {
           beta = beta_next;
         }
@@ -153,18 +189,25 @@ uword Optimizer::fista(
     // Proximal step
     betak = proximal_operator(betal - (XTX * betal - XTy) * invL, lambda * invL);
     
-    // FISTA update
-    tk = 0.5 * (1.0 + std::sqrt(1.0 + 4.0 * t0 * t0));
-    double weight = (t0 - 1.0) / tk;
+    // Assess convergence (scaled by L to be invariant to the step size)
+    delta = L * norm(beta - betak, 2);
     
-    // Accelerating step
-    betal = betak + weight * (betak - beta);
-    
-    // Assess convergence
-    delta = norm(beta - betak, 2);
+    if (dot(betal - betak, betak - beta) > 0) {
+      // Adaptive restart (O'Donoghue & Candes, 2015): the momentum points against the
+      // gradient mapping, so reset it
+      t0 = 1.0;
+      betal = betak;
+    } else {
+      // FISTA update
+      tk = 0.5 * (1.0 + std::sqrt(1.0 + 4.0 * t0 * t0));
+      double weight = (t0 - 1.0) / tk;
+      
+      // Accelerating step
+      betal = betak + weight * (betak - beta);
+      t0 = tk;
+    }
     
     beta = betak;
-    t0 = tk;
     iter++;
     
     if (iter % 100 == 0) R_CheckUserInterrupt();

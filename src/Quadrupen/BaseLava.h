@@ -43,16 +43,25 @@ protected:
     vec sqrtW = sqrt(orig.weights_) ;
     mat Xwc   = Xc ; Xwc.each_col() %= sqrtW ;
 
-    mat C_inv = solve(trimatu(chol(orig.S_.as_dense())), eye(orig.p_, orig.p_)) ;
-    mat U, V ; vec D ;
-    svd_econ(U, D, V, Xwc * C_inv) ;
+    mat U, V, C_invV ; vec D ;
+    if (is_positive_diagonal(orig.S_)) {
+      // S diagonal: C^{-1} = diag(1/sqrt(s)) acts as a column scaling, no p x p algebra
+      const vec c = 1.0 / sqrt(vec(orig.S_.diag())) ;
+      mat Xwc_c = Xwc ; Xwc_c.each_row() %= c.t() ;
+      svd_econ(U, D, V, Xwc_c) ;
+      C_invV = V.each_col() % c ;
+    } else {
+      mat C_inv = solve(trimatu(chol(orig.S_.as_dense())), eye(orig.p_, orig.p_)) ;
+      svd_econ(U, D, V, Xwc * C_inv) ;
+      C_invV = C_inv * V ;
+    }
     vec D2     = square(D) ;
     vec kcoeff = 1 / sqrt(D2 + 1) - 1 ;  // K12_w applied as: Xwc + U * (kcoeff .* U^T Xwc)
 
     mat Proj   = U * diagmat(D2 / (D2 + 1)) * U.t() ;
     // B_proj_w = C_inv * V * diag(D/(D2+1)) * (diag(sqrtW) * U)^T
     mat WU = U ; WU.each_col() %= sqrtW ;
-    mat B_proj = C_inv * V * diagmat(D / (D2 + 1)) * WU.t() ;
+    mat B_proj = C_invV * diagmat(D / (D2 + 1)) * WU.t() ;
 
     // X_new = K12_w * Xwc  (efficient: Xwc + U * diag(kcoeff) * U^T Xwc)
     mat UtXwc = U.t() * Xwc ; UtXwc.each_col() %= kcoeff ;

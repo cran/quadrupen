@@ -80,7 +80,7 @@ SparseRegularizer<matrix,norm>::SparseRegularizer(
     } else {
       set_  = ActiveSet(data_, A0, as<bool>(control["factmat"])) ;
       beta_ = beta0(A0) ;
-      grad_ += set_.XTXA_ * beta_ ;
+      grad_ += set_.XTXA_times(beta_) ;
     }
 
     // Set the penalty

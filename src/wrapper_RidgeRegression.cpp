@@ -17,5 +17,8 @@ List ridge_cpp(
     ) {
   RegressionData<mat> data(dataModel, intercept, as<bool>(controlFit["normalize"])) ;
   RidgeRegression ridge(std::move(data), regParam) ;
-  return ridge.to_list(ridge.solution_path(trimatu(as<mat>(dataModel["C_inv"])))) ;
+  // diagonal structure: no need for the (dense) inverse Cholesky factor
+  mat C_inv ;
+  if (!is_positive_diagonal(ridge.data_.S_)) C_inv = trimatu(as<mat>(dataModel["C_inv"])) ;
+  return ridge.to_list(ridge.solution_path(C_inv)) ;
 }
